@@ -40,3 +40,4 @@ EXPOSE 8000
 
 # Run Uvicorn server hosting both API and frontend SPA
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+

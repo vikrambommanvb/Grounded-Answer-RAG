@@ -103,7 +103,39 @@ Support a **Deterministic Mock Provider** alongside the **Groq Cloud Llama-3.3-7
 
 ---
 
-## 8. What Changed During Amendment Handling vs What Remained Unchanged
+## 8. Day-Two Amendment Handling: What Changed, What Was Kept, and Hindsight Analysis
+
+The introduction of **Amendment No. 2026-01** (effective 1 March 2026) represented a fundamental shift from a static corpus to an effective-dated, temporal policy system. Here is the formal record of our architectural decisions.
+
+### 8.1 What Was Changed
+1. **Dynamic Temporal Policy Resolver:**
+   - Designed and integrated `TemporalPolicyResolver` (`app/temporal/resolver.py`) to decouple policy content from execution dates.
+   - Built dual temporal evaluators enforcing the distinct criteria of:
+     - **Paragraph 5.1:** Part 6 rates, income thresholds, and sanction percentages apply strictly by **determination date** $\ge$ 1 March 2026 (even for earlier claim periods).
+     - **Paragraph 5.2:** Part 4 reporting timelines apply strictly by the **date the change of circumstances occurred** ($\ge$ 1 March 2026 = 14 days; prior to 1 March 2026 = 10 days).
+2. **Statutory Daily Apportionment Engine (§7.4.3 & Para 5.3):**
+   - Implemented exact day-count award apportionment (`app/temporal/apportioner.py`) for claims spanning across 1 March 2026. Pre-March days are calculated at 2025 rates and post-March days at amended rates without arbitrary flat rounding.
+3. **Date-Assumption Prevention Guard:**
+   - Modified the refusal engine to intercept rate and deadline queries submitted without temporal context (`MISSING_TEMPORAL_DATA`), preventing catastrophic default substitution of `datetime.now()`.
+4. **Citation Provenance & Amendment Overlay:**
+   - Updated the citation validator to tag amended clauses with their amendment provenance (e.g. `Amendment No. 2026-01 §1.1`, `Paragraph 5.1`).
+   - Added visual side-by-side and strike-through comparisons in the UI (`ExplorerPage` and `ClauseDrawer`).
+
+### 8.2 What We Chose NOT to Change (And Why)
+1. **The Original Baseline Policy Manual Remains 100% Immutable:**
+   - We strictly refused to mutate or overwrite baseline clause records in SQLite. Adjudicating retroactive appeals or historical audits requires 100% fidelity to the pre-amendment text.
+2. **The Full-Time Student Gap Trap (§7.1.3 &rarr; §5.4):**
+   - Amendment No. 2026-01 did not address or correct the student gap. We retained the `StudentGapDetector` to ensure the system continues to refuse with `APPARENT_GAP` rather than assuming the amendment resolved it.
+3. **Pre-Amendment Reporting Inconsistency (§4.3.2 vs §9.1.4):**
+   - While Amendment No. 2026-01 prospectively aligned both §4.3.2 and §9.1.4 to 14 days, Paragraph 5.2 explicitly preserves the pre-amendment reporting period for earlier changes. We chose to retain the `INTERNAL_CONFLICT` refusal for pre-March changes.
+
+### 8.3 What We Would Have Done Differently with Hindsight
+1. **Bi-Temporal Database Modeling from Day One:**
+   - If we had anticipated effective-dated amendments during Phase 1, we would have implemented a formal bi-temporal schema (`valid_from`, `valid_to`, `system_transaction_time`) directly in the SQLite `clauses` table rather than parsing the amendment as an overlay table.
+2. **First-Class Date Entities in the Retrieval Graph:**
+   - Natural language queries like *"for a claim decided next month"* require two-pass parsing: first extracting temporal expressions into ISO dates, then querying clauses. Designing date tokens directly into the BM25 inverted index would have streamlined single-pass retrieval.
+3. **Automated Cross-Reference Dependency Graph Visualization:**
+   - Developing an interactive SVG node graph showing how Amendment No. 2026-01 ripples through dependent clauses would provide casework supervisors with instant visual impact analysis.
 
 | Component | Status | Architectural Treatment |
 | :--- | :--- | :--- |
