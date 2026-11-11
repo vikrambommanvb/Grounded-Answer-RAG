@@ -1,4 +1,4 @@
-"""Grounded answer generation engine coordinating retrieval, temporal overlay, and citation validation."""
+"""Grounded answer generation engine coordinating retrieval, temporal overlay, refusal, and citation validation."""
 import re
 import time
 from typing import Optional, List
@@ -17,6 +17,7 @@ from app.retrieval.retriever import retriever
 from app.citations.validator import validate_citations
 from app.generation.prompt_builder import build_grounded_prompt, SYSTEM_INSTRUCTION
 from app.providers.factory import get_provider
+from app.refusal.engine import refusal_engine
 from app.core.logging import logger
 
 SUPERVISORY_GATES = {
@@ -28,11 +29,12 @@ SUPERVISORY_GATES = {
 }
 
 class GroundedAnswerGenerator:
-    """End-to-end engine producing grounded, traceable policy answers."""
+    """End-to-end engine producing grounded, traceable policy answers with responsible refusal."""
     
     def __init__(self):
         self.retriever = retriever
         self.temporal_resolver = temporal_resolver
+        self.refusal_engine = refusal_engine
 
     def generate_answer(self, request: QueryRequest) -> QueryResponse:
         """Execute full grounding pipeline for a query."""
@@ -53,55 +55,39 @@ class GroundedAnswerGenerator:
         # 3. Retrieve relevant policy clauses
         retrieval_res = self.retriever.retrieve(request.question, top_k=request.top_k or 5)
         candidate_clauses = retrieval_res.clauses
-        
-        # 4. Check for insufficient / out-of-scope retrieval
-        if not candidate_clauses:
-            elapsed_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
-            return QueryResponse(
-                status=ResponseStatus.REFUSED,
-                question=request.question,
-                refusal_details=RefusalDetails(
-                    category=RefusalCategory.OUT_OF_SCOPE,
-                    reason="The policy manual contains no provisions covering this topic.",
-                    missing_information=["Topic is outside the scope of the Calder County Household Support Program."],
-                    partial_relevant_clauses=[],
-                    recommended_next_step="Advise the resident to contact general county social assistance or external support services."
-                ),
-                execution_time_ms=elapsed_ms
-            )
-            
         candidate_ids = [c.clause_id for c in candidate_clauses]
         
-        # 5. Resolve temporal policy layer and transitional rules
+        # 4. Resolve temporal policy layer and transitional rules
         temporal_result = self.temporal_resolver.resolve(date_ctx, relevant_clause_ids=candidate_ids)
         
-        # 6. Check for Missing Temporal Context on date-sensitive questions
-        if temporal_result.resolution_type == TemporalResolutionType.MISSING_TEMPORAL_DATA:
+        # 5. Evaluate Refusal Engine (Out of scope, apparent gap, conflict, missing dates, missing facts)
+        should_refuse, refusal_details = self.refusal_engine.evaluate(
+            query=request.question,
+            retrieved_clauses=candidate_clauses,
+            temporal_result=temporal_result
+        )
+        
+        if should_refuse and refusal_details:
             elapsed_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
+            logger.info(f"Query refused with category: {refusal_details.category.value}")
             return QueryResponse(
                 status=ResponseStatus.REFUSED,
                 question=request.question,
-                refusal_details=RefusalDetails(
-                    category=RefusalCategory.MISSING_TEMPORAL_DATA,
-                    reason="The applicable policy provision was amended by Amendment No. 2026-01 (effective 1 March 2026). The answer depends on the determination date or change of circumstances date. The assistant cannot assume today's date.",
-                    missing_information=["Determination Date (e.g. before vs on/after 1 March 2026)", "Date of change of circumstances"],
-                    partial_relevant_clauses=candidate_ids[:2],
-                    recommended_next_step="Obtain the claim determination date or date the change occurred to determine whether pre-amendment or post-amendment rules apply."
-                ),
+                refusal_details=refusal_details,
                 temporal_resolution=temporal_result.resolution_type,
                 date_context=date_ctx,
                 warnings=temporal_result.warnings,
                 execution_time_ms=elapsed_ms
             )
             
-        # 7. Assemble Grounded Prompt
+        # 6. Assemble Grounded Prompt
         prompt = build_grounded_prompt(request.question, candidate_clauses, temporal_result)
         
-        # 8. Dispatch to Provider
+        # 7. Dispatch to Provider
         provider = get_provider(request.provider)
         raw_generation = provider.generate(prompt, SYSTEM_INSTRUCTION)
         
-        # 9. Validate Citations
+        # 8. Validate Citations
         is_valid_cit, badges, invalid_cits = validate_citations(
             raw_generation,
             temporal_result=temporal_result
@@ -139,7 +125,7 @@ class GroundedAnswerGenerator:
                 execution_time_ms=elapsed_ms
             )
             
-        # 10. Parse Direct Answer and Explanation from text
+        # 9. Parse Direct Answer and Explanation from text
         direct_answer = ""
         explanation = ""
         
@@ -154,7 +140,7 @@ class GroundedAnswerGenerator:
         if not direct_answer:
             direct_answer = raw_generation.strip()
             
-        # 11. Compile Warnings & Supervisory Gates
+        # 10. Compile Warnings & Supervisory Gates
         warnings: List[str] = list(temporal_result.warnings)
         for badge in badges:
             for gate_id, gate_warning in SUPERVISORY_GATES.items():
