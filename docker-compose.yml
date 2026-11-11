@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  grounded-answer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: grounded_answer_app
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - DEFAULT_PROVIDER=mock
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8000
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

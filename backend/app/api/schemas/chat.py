@@ -63,3 +63,4 @@ class QueryResponse(BaseModel):
     refusal_details: Optional[RefusalDetails] = None
     warnings: List[str] = Field(default_factory=list)
     execution_time_ms: float = 0.0
+    provider: str = "mock"

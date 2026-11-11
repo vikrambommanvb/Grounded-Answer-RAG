@@ -249,10 +249,10 @@ export const AssistantPage: React.FC = () => {
                 <div className="text-[10px] font-mono text-slate-500 flex items-center gap-2 shrink-0">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3 text-slate-400" />
-                    {response.latency_ms} ms
+                    {(response.execution_time_ms ?? response.latency_ms ?? 0).toFixed(1)} ms
                   </span>
                   <span className="px-1.5 py-0.5 rounded bg-white border border-slate-200 uppercase font-semibold">
-                    {response.provider}
+                    {response.provider || 'MOCK'}
                   </span>
                 </div>
               </div>

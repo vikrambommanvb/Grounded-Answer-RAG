@@ -72,8 +72,9 @@ export interface QueryResponse {
   warnings: string[];
   temporal_resolution: TemporalResolution | null;
   refusal_details: RefusalDetails | null;
-  provider: string;
-  latency_ms: number;
+  provider?: string;
+  execution_time_ms?: number;
+  latency_ms?: number;
 }
 
 export interface PolicyPartSummary {

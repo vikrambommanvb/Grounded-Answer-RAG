@@ -123,3 +123,4 @@ Support a **Deterministic Mock Provider** alongside the **Groq Cloud Llama-3.3-7
 1. **OCR Ingestion for Scanned Paper Petitions:** Current ingestion parses clean Markdown and DOCX archives. Future versions could integrate local Tesseract OCR for hand-written caseworker case notes.
 2. **Multi-Jurisdiction Policy Manuals:** The engine is optimized for Calder County HSP. Multi-county federated policy switching can be enabled by introducing a `county_id` tenant partition key in SQLite.
 3. **Casework Case File Persistence:** Currently, caseworkers query policies anonymously. Adding encrypted case-file attachment storage would allow the assistant to automatically extract dates from uploaded PDF notices.
+

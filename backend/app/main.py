@@ -38,3 +38,27 @@ app.include_router(policies.router, prefix="/api")
 app.include_router(documents.router, prefix="/api")
 app.include_router(evaluation.router, prefix="/api")
 app.include_router(system.router, prefix="/api")
+
+# Serve built frontend static files if present
+import os
+from fastapi import HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend", "dist")
+if os.path.exists(frontend_dist) and os.path.exists(os.path.join(frontend_dist, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+
+    @app.get("/")
+    async def serve_root():
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
+
+    @app.get("/{page}")
+    async def serve_spa_page(page: str):
+        allowed_pages = {"assistant", "explorer", "timeline", "evaluation", "documents", "settings", "about"}
+        if page in allowed_pages:
+            return FileResponse(os.path.join(frontend_dist, "index.html"))
+        target = os.path.join(frontend_dist, page)
+        if os.path.exists(target) and os.path.isfile(target):
+            return FileResponse(target)
+        raise HTTPException(status_code=404, detail="Not Found")

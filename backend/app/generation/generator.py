@@ -108,7 +108,8 @@ class GroundedAnswerGenerator:
                 temporal_resolution=temporal_result.resolution_type,
                 date_context=date_ctx,
                 warnings=temporal_result.warnings,
-                execution_time_ms=elapsed_ms
+                execution_time_ms=elapsed_ms,
+                provider=request.provider or "mock"
             )
             
         # 7. Assemble Grounded Prompt
@@ -194,7 +195,8 @@ class GroundedAnswerGenerator:
             transitional_rules_applied=temporal_result.transitional_rules_applied,
             apportionment=temporal_result.apportionment,
             warnings=warnings,
-            execution_time_ms=elapsed_ms
+            execution_time_ms=elapsed_ms,
+            provider=provider.provider_name
         )
 
 # Global generator instance
