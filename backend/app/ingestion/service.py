@@ -64,3 +64,4 @@ def run_ingestion(
     }
     
     return validation_report, stats
+

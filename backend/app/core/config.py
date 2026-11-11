@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     # Retrieval
     RETRIEVAL_TOP_K: int = 5
     HYBRID_RETRIEVAL: bool = True
-    SIMILARITY_THRESHOLD: float = 0.35
+    SIMILARITY_THRESHOLD: float = 0.20
     
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"),

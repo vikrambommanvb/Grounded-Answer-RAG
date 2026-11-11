@@ -201,3 +201,4 @@ def parse_amendment(file_path: Path) -> Tuple[DocumentRecord, List[AmendmentReco
     )
     
     return doc, amendments
+

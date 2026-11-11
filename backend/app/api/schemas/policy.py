@@ -68,3 +68,4 @@ class CorpusValidationReport(BaseModel):
     broken_cross_references: List[Dict[str, Any]] = Field(default_factory=list)
     amendment_items_count: int
     is_valid: bool = True
+

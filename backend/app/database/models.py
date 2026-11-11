@@ -181,3 +181,4 @@ def _row_to_amendment(r: sqlite3.Row) -> AmendmentRecord:
         transitional_rule_ref=r["transitional_rule_ref"],
         staff_note=r["staff_note"]
     )
+

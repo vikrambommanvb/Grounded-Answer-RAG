@@ -161,3 +161,4 @@ def parse_policy_manual(file_path: Path) -> Tuple[DocumentRecord, List[ClauseRec
     )
     
     return doc, clauses
+

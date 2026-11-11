@@ -91,3 +91,4 @@ def validate_corpus(
         amendment_items_count=len(amendments),
         is_valid=is_valid
     )
+

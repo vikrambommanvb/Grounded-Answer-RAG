@@ -143,3 +143,4 @@ def test_ingestion_idempotence():
     assert len(all_clauses) == 148
     all_amendments = get_all_amendments()
     assert len(all_amendments) == 9
+
