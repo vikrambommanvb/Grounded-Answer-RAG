@@ -7,3 +7,4 @@ export const fetchHealth = async (): Promise<HealthResponse> => {
   }
   return response.json();
 };
+

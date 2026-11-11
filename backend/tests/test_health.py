@@ -9,3 +9,4 @@ def test_health_check(client):
     assert data["app_name"] == "The Grounded Answer"
     assert "version" in data
     assert "default_provider" in data
+

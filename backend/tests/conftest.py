@@ -8,3 +8,4 @@ def client():
     """FastAPI TestClient fixture."""
     with TestClient(app) as test_client:
         yield test_client
+

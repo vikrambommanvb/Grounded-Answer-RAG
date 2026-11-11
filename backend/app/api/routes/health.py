@@ -24,3 +24,4 @@ def get_health() -> HealthResponse:
         default_provider=settings.DEFAULT_PROVIDER,
         groq_configured=bool(settings.GROQ_API_KEY.strip())
     )
+

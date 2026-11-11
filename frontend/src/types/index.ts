@@ -6,3 +6,4 @@ export interface HealthResponse {
   default_provider: string;
   groq_configured: boolean;
 }
+
