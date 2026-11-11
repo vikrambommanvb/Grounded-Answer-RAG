@@ -25,6 +25,18 @@ class MockLLMProvider(BaseLLMProvider):
         
         prompt_lower = prompt.lower()
         
+        # Case 0: Dual transitional question (reporting period + earnings disregard)
+        if is_transitional or ("reporting" in prompt_lower and ("disregard" in prompt_lower or "earnings" in prompt_lower)):
+            return (
+                "DIRECT ANSWER: Under Paragraph 5.2 of Amendment No. 2026-01, the pre-amendment reporting period of 10 calendar days applies (§4.3.2) "
+                "because the change occurred prior to 1 March 2026; under Paragraph 5.1, the amended earnings disregard of $175 per month applies (§6.4.1(a)) "
+                "because determination is made after 1 March 2026.\n\n"
+                "EXPLANATION: Paragraph 5.1 and Paragraph 5.2 establish distinct transitional rules: (1) Rates under Part 6 (including the $175 earnings disregard "
+                "in §6.4.1(a)) apply to determinations made on or after 1 March 2026, even for prior periods. (2) Reporting periods under §4.3.2 apply only to changes "
+                "occurring on or after 1 March 2026; changes occurring prior to 1 March 2026 retain the earlier reporting period (10 calendar days under §4.3.2).\n\n"
+                "CITATIONS: §4.3.2, §6.4.1(a)"
+            )
+            
         # Case 1: Earnings disregard
         if "earnings disregard" in prompt_lower or ("disregarded" in prompt_lower and "earnings" in prompt_lower):
             if is_post_march or (is_transitional and "determination" in prompt_lower):

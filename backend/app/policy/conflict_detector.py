@@ -13,26 +13,32 @@ def detect_internal_conflict(
     Detect queries encountering the internal draftsmanship conflict between
     §4.3.2 (10 calendar days reporting) and §9.1.4 (30 calendar days safe harbor).
     """
-    # If explicitly resolved under post-amendment rules (both aligned to 14 days), no conflict exists
-    if temporal_result and temporal_result.resolution_type == TemporalResolutionType.POST_AMENDMENT:
-        return False, None
-        
     q_lower = query.lower()
-    
-    reporting_tokens = ["report", "reporting", "change of circumstances", "overpayment", "safe harbor", "deadline", "timeline", "notice", "4.3.2", "9.1.4"]
-    matches = [tok for tok in reporting_tokens if tok in q_lower]
     
     conflict_words = ["conflict", "contradiction", "inconsistency", "differ", "discrepancy", "both", "10 days", "30 days"]
     explicit_conflict_query = any(cw in q_lower for cw in conflict_words)
     
-    # Trigger if explicitly asking about the contradiction or querying reporting deadline for pre-amendment
+    # If this is a transitional split or spanning case, Paragraph 5.2 and 5.3 settle the governing rule
+    # unless caseworker is specifically probing the overpayment contradiction
+    if temporal_result and temporal_result.resolution_type in (
+        TemporalResolutionType.POST_AMENDMENT,
+        TemporalResolutionType.TRANSITIONAL_SPLIT,
+        TemporalResolutionType.SPANNING_CLAIM
+    ):
+        if not explicit_conflict_query and "overpayment" not in q_lower and "safe harbor" not in q_lower:
+            return False, None
+            
+    reporting_tokens = ["report", "reporting", "change of circumstances", "overpayment", "safe harbor", "deadline", "timeline", "notice", "4.3.2", "9.1.4"]
+    matches = [tok for tok in reporting_tokens if tok in q_lower]
+    
     is_pre_amendment = (temporal_result is None or temporal_result.resolution_type in (
         TemporalResolutionType.PRE_AMENDMENT,
-        TemporalResolutionType.TRANSITIONAL_SPLIT,
-        TemporalResolutionType.MISSING_TEMPORAL_DATA
+        TemporalResolutionType.MISSING_TEMPORAL_DATA,
+        TemporalResolutionType.TRANSITIONAL_SPLIT
     ))
     
-    if (len(matches) >= 2 and is_pre_amendment) or (explicit_conflict_query and len(matches) >= 1):
+    # Triggers on pre-amendment overpayment/reporting questions or explicit conflict queries
+    if (("overpayment" in q_lower or explicit_conflict_query) and len(matches) >= 1 and is_pre_amendment) or (len(matches) >= 3 and is_pre_amendment):
         reason = (
             "The pre-amendment policy manual contains a direct internal contradiction regarding change reporting deadlines. "
             "Under §4.3.2, recipients must report changes 'within 10 calendar days of the change occurring'. However, "
@@ -44,7 +50,7 @@ def detect_internal_conflict(
             "Resolution by Department policy management of the conflicting 10-day vs 30-day standards for pre-March 2026 changes",
             "Supervisor direction on whether §4.3.2 or §9.1.4 safe harbor prevails in individual casework"
         ]
-        relevant_clauses = ["§4.3.2", "§9.1.4", "Amendment No. 2026-01 §2.1", "Amendment No. 2026-01 §2.2"]
+        relevant_clauses = ["§4.3.2", "§9.1.4"]
         
         return True, RefusalDetails(
             category=RefusalCategory.INTERNAL_CONFLICT,

@@ -11,14 +11,13 @@ def detect_apparent_gap(query: str) -> Tuple[bool, Optional[RefusalDetails]]:
     """
     q_lower = query.lower()
     
-    # Check for student / education calculation queries
-    student_tokens = ["student", "full-time student", "university", "college", "higher education"]
-    has_student = any(re.search(rf"\b{tok}\b", q_lower) for tok in student_tokens)
+    # Matches student, students, full-time student(s), university, college, higher education
+    has_student = bool(re.search(r"\b(?:students?|full-time\s+students?|university|college|higher\s+education)\b", q_lower))
     
-    calculation_tokens = ["needs figure", "needs calculation", "award", "how are", "treated", "entitlement", "amount", "calculate", "living cost", "7.1.3", "5.4"]
-    has_calc = any(tok in q_lower for tok in calculation_tokens)
+    calc_pattern = r"\b(?:needs\s+figure|needs\s+calculation|award|how\s+are|treated|entitlement|amount|calculate|living\s+cost|7\.1\.3|5\.4|eligible|allowance|absence)\b"
+    has_calc = bool(re.search(calc_pattern, q_lower))
     
-    if has_student and (has_calc or "eligible" in q_lower or "allowance" in q_lower or "absence" in q_lower):
+    if has_student and has_calc:
         reason = (
             "The policy manual contains a recognized apparent gap regarding full-time students. "
             "Although §1.4.6 defines 'full-time student' and §7.1.3 states that the needs figure is calculated "

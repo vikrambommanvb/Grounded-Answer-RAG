@@ -10,6 +10,7 @@ from app.api.schemas.chat import (
     RefusalDetails,
     CitationBadge
 )
+from app.api.schemas.retrieval import RetrievedClause
 from app.temporal.extractor import extract_dates_from_query, parse_date_string
 from app.temporal.models import DateContext, TemporalResolutionType
 from app.temporal.resolver import temporal_resolver
@@ -18,6 +19,7 @@ from app.citations.validator import validate_citations
 from app.generation.prompt_builder import build_grounded_prompt, SYSTEM_INSTRUCTION
 from app.providers.factory import get_provider
 from app.refusal.engine import refusal_engine
+from app.database.models import get_clause_by_id
 from app.core.logging import logger
 
 SUPERVISORY_GATES = {
@@ -54,13 +56,42 @@ class GroundedAnswerGenerator:
         
         # 3. Retrieve relevant policy clauses
         retrieval_res = self.retriever.retrieve(request.question, top_k=request.top_k or 5)
-        candidate_clauses = retrieval_res.clauses
+        candidate_clauses: List[RetrievedClause] = list(retrieval_res.clauses)
+        
+        # 4. Spanning claim clause injection: ensure §7.4.3 is present if spanning 1 March 2026
+        if date_ctx.claim_start_date and date_ctx.claim_end_date:
+            if date_ctx.claim_start_date < self.temporal_resolver.effective_date <= date_ctx.claim_end_date:
+                if not any(c.clause_id == "§7.4.3" for c in candidate_clauses):
+                    c_743 = get_clause_by_id("§7.4.3")
+                    if c_743:
+                        candidate_clauses.append(
+                            RetrievedClause(
+                                clause_id=c_743.clause_id,
+                                canonical_id=c_743.canonical_id,
+                                part_number=c_743.part_number,
+                                part_title=c_743.part_title,
+                                section_number=c_743.section_number,
+                                section_title=c_743.section_title,
+                                title=c_743.title,
+                                exact_text=c_743.full_text,
+                                document_id=c_743.document_id,
+                                source_version=c_743.version,
+                                effective_date=c_743.effective_date,
+                                retrieval_score=0.95,
+                                lexical_score=0.95,
+                                semantic_score=0.95,
+                                source_location="Part 7, Section 7.4",
+                                cross_references=c_743.cross_references,
+                                is_expanded=False
+                            )
+                        )
+                        
         candidate_ids = [c.clause_id for c in candidate_clauses]
         
-        # 4. Resolve temporal policy layer and transitional rules
+        # 5. Resolve temporal policy layer and transitional rules
         temporal_result = self.temporal_resolver.resolve(date_ctx, relevant_clause_ids=candidate_ids)
         
-        # 5. Evaluate Refusal Engine (Out of scope, apparent gap, conflict, missing dates, missing facts)
+        # 6. Evaluate Refusal Engine (Out of scope, apparent gap, conflict, missing dates, missing facts)
         should_refuse, refusal_details = self.refusal_engine.evaluate(
             query=request.question,
             retrieved_clauses=candidate_clauses,
@@ -80,14 +111,14 @@ class GroundedAnswerGenerator:
                 execution_time_ms=elapsed_ms
             )
             
-        # 6. Assemble Grounded Prompt
+        # 7. Assemble Grounded Prompt
         prompt = build_grounded_prompt(request.question, candidate_clauses, temporal_result)
         
-        # 7. Dispatch to Provider
+        # 8. Dispatch to Provider
         provider = get_provider(request.provider)
         raw_generation = provider.generate(prompt, SYSTEM_INSTRUCTION)
         
-        # 8. Validate Citations
+        # 9. Validate Citations
         is_valid_cit, badges, invalid_cits = validate_citations(
             raw_generation,
             temporal_result=temporal_result
@@ -125,7 +156,7 @@ class GroundedAnswerGenerator:
                 execution_time_ms=elapsed_ms
             )
             
-        # 9. Parse Direct Answer and Explanation from text
+        # 10. Parse Direct Answer and Explanation from text
         direct_answer = ""
         explanation = ""
         
@@ -140,7 +171,7 @@ class GroundedAnswerGenerator:
         if not direct_answer:
             direct_answer = raw_generation.strip()
             
-        # 10. Compile Warnings & Supervisory Gates
+        # 11. Compile Warnings & Supervisory Gates
         warnings: List[str] = list(temporal_result.warnings)
         for badge in badges:
             for gate_id, gate_warning in SUPERVISORY_GATES.items():
