@@ -93,3 +93,4 @@ def test_retrieval_diagnostics_and_provenance(indexed_retriever):
         assert c.effective_date == "2025-12-31"
         assert 0.0 <= c.retrieval_score <= 1.0
         assert c.source_location.startswith("Part ")
+

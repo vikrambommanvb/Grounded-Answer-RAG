@@ -36,3 +36,4 @@ class RetrievalResult(BaseModel):
     """Container for retrieved clauses and diagnostics."""
     clauses: List[RetrievedClause]
     diagnostics: RetrievalDiagnostics
+
