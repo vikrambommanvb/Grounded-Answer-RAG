@@ -8,13 +8,21 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchDocuments, fetchDocumentDetail } from '../services/api';
 
 export const DocumentsPage: React.FC = () => {
-  const [selectedDocId, setSelectedDocId] = useState<string>('policy-manual');
+  const [selectedDocId, setSelectedDocId] = useState<string>('HSP-MANUAL-2025-12');
   const [viewMode, setViewMode] = useState<'typeset' | 'raw'>('typeset');
 
   const { data: documents } = useQuery({
     queryKey: ['sourceDocuments'],
     queryFn: fetchDocuments,
   });
+
+  React.useEffect(() => {
+    if (documents && documents.length > 0) {
+      if (!documents.some(d => d.document_id === selectedDocId)) {
+        setSelectedDocId(documents[0].document_id);
+      }
+    }
+  }, [documents, selectedDocId]);
 
   const { data: docDetail, isLoading: detailLoading } = useQuery({
     queryKey: ['documentDetail', selectedDocId],

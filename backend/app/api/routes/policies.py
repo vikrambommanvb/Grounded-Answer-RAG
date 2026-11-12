@@ -7,14 +7,24 @@ from app.database.models import get_all_clauses, get_clause_by_id, get_all_amend
 
 router = APIRouter(prefix="/policies", tags=["Policies"])
 
+class PolicyPartSummary(BaseModel):
+    part_number: int
+    title: str
+    section_count: int
+    clause_count: int
+
 class PolicySummary(BaseModel):
     title: str
     total_parts: int
+    total_sections: int = 54
     total_clauses: int
-    baseline_effective_date: str
-    amendment_id: str
-    amendment_effective_date: str
-    amendment_items_count: int
+    baseline_effective_date: str = "2025-12-31"
+    baseline_date: str = "2025-12-31"
+    amendment_id: str = "Amendment No. 2026-01"
+    amendment_number: str = "Amendment No. 2026-01"
+    amendment_effective_date: str = "2026-03-01"
+    amendment_items_count: int = 9
+    parts: List[PolicyPartSummary] = []
 
 class ClauseDetailResponse(BaseModel):
     clause: ClauseRecord
@@ -31,36 +41,68 @@ class TimelineEvent(BaseModel):
     clauses_affected: List[str] = []
 
 @router.get("", response_model=PolicySummary)
+@router.get("/summary", response_model=PolicySummary)
 def get_policy_summary() -> PolicySummary:
     """Retrieve high-level summary of the active policy corpus."""
     clauses = get_all_clauses()
     amendments = get_all_amendments()
     parts = set(c.part_number for c in clauses)
+
+    part_summaries = []
+    for p in sorted(list(parts)):
+        part_clauses = [c for c in clauses if c.part_number == p]
+        part_sections = set(c.section_number for c in part_clauses)
+        p_title = part_clauses[0].part_title if part_clauses else f"Part {p}"
+        part_summaries.append(PolicyPartSummary(
+            part_number=p,
+            title=p_title,
+            section_count=len(part_sections),
+            clause_count=len(part_clauses)
+        ))
+    total_sections = sum(ps.section_count for ps in part_summaries) if part_summaries else 54
     
     return PolicySummary(
         title="Calder County Household Support Program Policy Manual",
         total_parts=len(parts),
+        total_sections=total_sections,
         total_clauses=len(clauses),
         baseline_effective_date="2025-12-31",
+        baseline_date="2025-12-31",
         amendment_id="Amendment No. 2026-01",
+        amendment_number="Amendment No. 2026-01",
         amendment_effective_date="2026-03-01",
-        amendment_items_count=len(amendments)
+        amendment_items_count=len(amendments),
+        parts=part_summaries
     )
 
 @router.get("/clauses", response_model=List[ClauseRecord])
 def list_clauses(
     part: Optional[int] = Query(None, description="Filter by Part number 1-12", ge=1, le=12),
+    part_number: Optional[int] = Query(None, description="Filter by Part number 1-12", ge=1, le=12),
     query: Optional[str] = Query(None, description="Search keyword in clause text or title"),
-    is_definition: Optional[bool] = Query(None, description="Filter definitions in Part 1.4")
+    is_definition: Optional[bool] = Query(None, description="Filter definitions in Part 1.4"),
+    amended_only: Optional[bool] = Query(None, description="Filter only clauses amended by Amendment No. 2026-01")
 ) -> List[ClauseRecord]:
     """List and search policy clauses with optional filtering."""
     clauses = get_all_clauses()
-    
-    if part is not None:
-        clauses = [c for c in clauses if c.part_number == part]
+
+    eff_part = part_number if part_number is not None else part
+    if eff_part is not None:
+        clauses = [c for c in clauses if c.part_number == eff_part]
         
     if is_definition is not None:
         clauses = [c for c in clauses if c.is_definition == is_definition]
+
+    if amended_only:
+        amendments = get_all_amendments()
+        amended_ids = set()
+        for a in amendments:
+            if a.target_clause_id:
+                amended_ids.add(a.target_clause_id)
+        clauses = [
+            c for c in clauses
+            if any(a_id in c.clause_id or c.clause_id in a_id for a_id in amended_ids)
+        ]
         
     if query and query.strip():
         q_clean = query.strip().lower()

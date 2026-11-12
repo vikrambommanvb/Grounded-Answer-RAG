@@ -15,7 +15,7 @@ export const Navbar: React.FC = () => {
     queryFn: fetchSystemConfig,
   });
 
-  const isHealthy = health?.status === 'healthy';
+  const isHealthy = health?.status === 'ok' || health?.status === 'healthy';
   const activeProvider = config?.active_provider || health?.default_provider || 'mock';
 
   return (
