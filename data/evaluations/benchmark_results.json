@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-12T13:45:37.907308",
+  "timestamp": "2026-11-12T14:13:16.964475",
   "provider": "mock",
   "summary": {
     "total_tests": 10,
@@ -8,7 +8,7 @@
     "accuracy_percentage": 100.0,
     "refusal_correctness_percentage": 100.0,
     "citation_validity_percentage": 100.0,
-    "average_latency_ms": 1.81
+    "average_latency_ms": 1.74
   },
   "results": [
     {
@@ -21,7 +21,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 8.42,
+      "latency_ms": 8.15,
       "details": "Status: ANSWERED | Citations: 2 | Refusal: None"
     },
     {
@@ -34,7 +34,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.39,
+      "latency_ms": 1.34,
       "details": "Status: ANSWERED_WITH_WARNING | Citations: 3 | Refusal: None"
     },
     {
@@ -47,7 +47,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.38,
+      "latency_ms": 1.42,
       "details": "Status: ANSWERED_WITH_WARNING | Citations: 2 | Refusal: None"
     },
     {
@@ -60,7 +60,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.49,
+      "latency_ms": 1.37,
       "details": "Status: ANSWERED | Citations: 2 | Refusal: None"
     },
     {
@@ -73,7 +73,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.86,
+      "latency_ms": 1.75,
       "details": "Status: ANSWERED_WITH_WARNING | Citations: 2 | Refusal: None"
     },
     {
@@ -86,7 +86,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.51,
+      "latency_ms": 1.47,
       "details": "Status: ANSWERED_WITH_WARNING | Citations: 1 | Refusal: None"
     },
     {
@@ -99,7 +99,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 0.6,
+      "latency_ms": 0.57,
       "details": "Status: REFUSED | Citations: 0 | Refusal: INTERNAL_CONFLICT"
     },
     {
@@ -112,7 +112,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 0.56,
+      "latency_ms": 0.53,
       "details": "Status: REFUSED | Citations: 0 | Refusal: APPARENT_GAP"
     },
     {
@@ -125,7 +125,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 0.42,
+      "latency_ms": 0.4,
       "details": "Status: REFUSED | Citations: 0 | Refusal: OUT_OF_SCOPE"
     },
     {
@@ -138,7 +138,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 0.46,
+      "latency_ms": 0.44,
       "details": "Status: REFUSED | Citations: 0 | Refusal: MISSING_TEMPORAL_DATA"
     }
   ]

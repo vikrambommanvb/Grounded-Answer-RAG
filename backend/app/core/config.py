@@ -19,7 +19,10 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
+        "https://grounded-answer-rag.vercel.app",
+        "https://grounded-answer-rag.onrender.com",
     ]
+    CORS_ORIGIN_REGEX: str = r"^https:\/\/.*\.vercel\.app$"
     
     # Storage
     DATABASE_URL: str = f"sqlite:///{BASE_DIR}/data/sqlite.db"

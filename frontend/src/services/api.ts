@@ -11,7 +11,22 @@ import {
   HealthResponse,
 } from '../types';
 
-const API_BASE = '/api';
+/**
+ * Resolves the backend API base endpoint URL:
+ * - Production on Vercel: reads VITE_API_BASE_URL (e.g. 'https://grounded-answer-rag.onrender.com')
+ *   and ensures '/api' is appended without duplication.
+ * - Local development / missing env: safely falls back to '/api' to use Vite's dev proxy (http://127.0.0.1:8000).
+ */
+const getApiBase = (): string => {
+  const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
+  if (!envUrl) {
+    return '/api';
+  }
+  const cleanUrl = envUrl.replace(/\/+$/, '');
+  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+};
+
+export const API_BASE = getApiBase();
 
 export const fetchHealth = async (): Promise<HealthResponse> => {
   const res = await fetch(`${API_BASE}/health`);
