@@ -132,8 +132,8 @@ export const DocumentsPage: React.FC = () => {
       <div className="bg-white border border-[#E5E5E0] shadow-subtle overflow-hidden">
         {/* Reader Header & Tab Switcher with Shared layoutId */}
         <div className="p-4 border-b border-[#E5E5E0] bg-[#F8F8F5] flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="meta-caps text-[#171A21]">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="meta-caps text-[#171A21] truncate max-w-[260px] sm:max-w-md">
               Reading: {docDetail?.title || 'Loading document...'}
             </span>
           </div>

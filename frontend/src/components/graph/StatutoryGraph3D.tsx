@@ -171,13 +171,14 @@ export const StatutoryGraph3D: React.FC<StatutoryGraph3DProps> = ({
     let rotationVelocityX = 0;
     let rotationVelocityY = 0;
 
-    const onPointerDown = (e: MouseEvent) => {
+    const onPointerDown = (e: PointerEvent) => {
       isDragging = true;
       prevMouseX = e.clientX;
       prevMouseY = e.clientY;
+      container.setPointerCapture?.(e.pointerId);
     };
 
-    const onPointerMove = (e: MouseEvent) => {
+    const onPointerMove = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / width) * 2 - 1;
       mouse.y = -((e.clientY - rect.top) / height) * 2 + 1;
@@ -207,12 +208,12 @@ export const StatutoryGraph3D: React.FC<StatutoryGraph3DProps> = ({
       }
     };
 
-    const onPointerUp = (e: MouseEvent) => {
+    const onPointerUp = (e: PointerEvent) => {
       if (isDragging) {
-        // If minimal movement, treat as click
+        // If minimal movement, treat as click / tap
         const deltaX = Math.abs(e.clientX - prevMouseX);
         const deltaY = Math.abs(e.clientY - prevMouseY);
-        if (deltaX < 3 && deltaY < 3) {
+        if (deltaX < 5 && deltaY < 5) {
           raycaster.setFromCamera(mouse, camera);
           const meshesArray = Array.from(nodeMeshes.values());
           const intersects = raycaster.intersectObjects(meshesArray);
@@ -223,11 +224,17 @@ export const StatutoryGraph3D: React.FC<StatutoryGraph3DProps> = ({
         }
       }
       isDragging = false;
+      try {
+        container.releasePointerCapture?.(e.pointerId);
+      } catch {
+        // ignore if not captured
+      }
     };
 
-    container.addEventListener('mousedown', onPointerDown);
-    window.addEventListener('mousemove', onPointerMove);
-    window.addEventListener('mouseup', onPointerUp);
+    container.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
 
     // 7. Subtle Animation Loop (Apple damping & smooth settle)
     let animationFrameId: number;
@@ -256,9 +263,10 @@ export const StatutoryGraph3D: React.FC<StatutoryGraph3DProps> = ({
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      container.removeEventListener('mousedown', onPointerDown);
-      window.removeEventListener('mousemove', onPointerMove);
-      window.removeEventListener('mouseup', onPointerUp);
+      container.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
       window.removeEventListener('resize', handleResize);
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
@@ -319,11 +327,12 @@ export const StatutoryGraph3D: React.FC<StatutoryGraph3DProps> = ({
         <div className="relative">
           <div
             ref={mountRef}
-            className="w-full h-80 sm:h-96 bg-[#F8F8F5] cursor-grab active:cursor-grabbing"
+            style={{ touchAction: 'pan-y' }}
+            className="w-full h-72 sm:h-96 bg-[#F8F8F5] cursor-grab active:cursor-grabbing"
           />
 
-          {/* Discreet 3D Legend */}
-          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md border border-[#E5E5E0] p-2 text-[10px] font-mono space-y-1 text-[#252A32] shadow-subtle">
+          {/* Discreet 3D Legend (hidden on small mobile screens to maximize canvas space) */}
+          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md border border-[#E5E5E0] p-2 text-[10px] font-mono space-y-1 text-[#252A32] shadow-subtle hidden sm:block">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#252A32]" />
               <span>Standard Clause (§1.1 – §12.2)</span>

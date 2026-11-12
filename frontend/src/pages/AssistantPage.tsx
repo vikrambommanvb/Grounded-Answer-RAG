@@ -159,10 +159,10 @@ export const AssistantPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Three-Column Workstation Layout */}
+      {/* Three-Column Workstation Layout (Responsive order: Main Inquiry first on mobile) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Column 1: Prior Inquiries / History (3 cols on lg) */}
-        <div className="lg:col-span-3 space-y-4">
+        {/* Column 1: Prior Inquiries / History (order-2 on mobile, order-1 on lg) */}
+        <div className="order-2 lg:order-1 lg:col-span-3 space-y-4">
           <div className="bg-white border border-[#E5E5E0] p-3.5 space-y-3 shadow-subtle">
             <div className="flex items-center justify-between border-b border-[#E5E5E0] pb-2">
               <span className="meta-caps text-[#171A21]">Session Docket History</span>
@@ -248,8 +248,8 @@ export const AssistantPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Column 2: Center Answer Workspace (6 cols on lg) */}
-        <div className="lg:col-span-6 space-y-4">
+        {/* Column 2: Center Answer Workspace (order-1 on mobile, order-2 on lg) */}
+        <div className="order-1 lg:order-2 lg:col-span-6 space-y-4">
           {/* Query Formulation Box */}
           <div className="bg-white border border-[#E5E5E0] p-4 space-y-3.5 shadow-subtle">
             <div className="flex items-center justify-between border-b border-[#E5E5E0] pb-2">
@@ -305,8 +305,8 @@ export const AssistantPage: React.FC = () => {
                 }}
               />
 
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-[#555C68] font-mono">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <span className="text-[11px] text-[#555C68] font-mono hidden sm:inline">
                   Press Enter to submit &bull; Shift + Enter for newline
                 </span>
 
@@ -314,7 +314,7 @@ export const AssistantPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!question.trim() || loading}
-                  className="pressable inline-flex items-center gap-2 px-4 py-2 bg-[#171A21] hover:bg-[#252A32] disabled:opacity-40 text-white text-xs font-semibold tracking-wide transition-all active:scale-[0.97] shadow-subtle"
+                  className="pressable w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-[#171A21] hover:bg-[#252A32] disabled:opacity-40 text-white text-xs font-semibold tracking-wide transition-all active:scale-[0.97] shadow-subtle"
                 >
                   {loading ? (
                     <>
@@ -463,8 +463,8 @@ export const AssistantPage: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        {/* Column 3: Evidence Inspector / Envelope (3 cols on lg) */}
-        <div className="lg:col-span-3 space-y-4">
+        {/* Column 3: Evidence Inspector / Envelope (order-3 on all screens) */}
+        <div className="order-3 lg:order-3 lg:col-span-3 space-y-4">
           {response?.retrieved_evidence && response.retrieved_evidence.length > 0 ? (
             <EvidenceInspector
               evidence={response.retrieved_evidence}

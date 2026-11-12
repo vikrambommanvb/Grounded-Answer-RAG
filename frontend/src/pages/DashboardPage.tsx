@@ -118,16 +118,16 @@ export const DashboardPage: React.FC = () => {
             <span className="meta-caps text-[#555C68] block">
               Calder County Department of Social Services &bull; HSP Policy Division
             </span>
-            <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#171A21] not-italic balance-text">
+            <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-[#171A21] not-italic balance-text">
               Statutory Adjudication Registry &amp; Policy Docket
             </h1>
           </div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
             {/* Emphasized Primary CTA */}
             <button
               type="button"
               onClick={() => navigate('/assistant')}
-              className="pressable inline-flex items-center gap-2 px-4 py-2 bg-[#171A21] hover:bg-[#252A32] text-white text-xs font-semibold tracking-wide transition-all active:scale-[0.97] shadow-subtle"
+              className="pressable w-full sm:w-auto justify-center inline-flex items-center gap-2 px-4 py-2 bg-[#171A21] hover:bg-[#252A32] text-white text-xs font-semibold tracking-wide transition-all active:scale-[0.97] shadow-subtle"
             >
               <MessageSquareText className="w-3.5 h-3.5" />
               <span>Launch Casework Assistant</span>
@@ -135,7 +135,7 @@ export const DashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/explorer')}
-              className="pressable inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-[#F8F8F5] border border-[#E5E5E0] text-[#171A21] text-xs font-medium transition-all active:scale-[0.97]"
+              className="pressable w-full sm:w-auto justify-center inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-[#F8F8F5] border border-[#E5E5E0] text-[#171A21] text-xs font-medium transition-all active:scale-[0.97]"
             >
               <BookOpen className="w-3.5 h-3.5 text-[#555C68]" />
               <span>Browse Manual</span>

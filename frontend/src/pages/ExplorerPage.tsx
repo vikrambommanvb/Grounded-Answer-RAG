@@ -54,6 +54,18 @@ export const ExplorerPage: React.FC = () => {
     'Part VII', 'Part VIII', 'Part IX', 'Part X', 'Part XI', 'Part XII',
   ];
 
+  const handleSelectClause = (cid: string) => {
+    setSelectedClauseId(cid);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        const el = document.getElementById('clause-detail-pane');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 50);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Editorial Masthead with Specificity */}
@@ -102,7 +114,7 @@ export const ExplorerPage: React.FC = () => {
         <StatutoryGraph3D
           clauses={clausesData.clauses}
           selectedClauseId={selectedClauseId}
-          onSelectClause={(cid) => setSelectedClauseId(cid)}
+          onSelectClause={(cid) => handleSelectClause(cid)}
         />
       )}
 
@@ -191,7 +203,7 @@ export const ExplorerPage: React.FC = () => {
                 return (
                   <div
                     key={clause.clause_id}
-                    onClick={() => setSelectedClauseId(clause.clause_id)}
+                    onClick={() => handleSelectClause(clause.clause_id)}
                     className={`pressable p-3 cursor-pointer transition-all space-y-1 active:scale-[0.98] ${
                       isSelected
                         ? 'bg-[#F8F8F5] border-l-2 border-[#171A21] -ml-px pl-[11px]'
@@ -227,7 +239,7 @@ export const ExplorerPage: React.FC = () => {
         </div>
 
         {/* Right Column: Verbatim Statutory Reading Pane & Diff (7 cols on lg) */}
-        <div className="lg:col-span-7 space-y-4">
+        <div id="clause-detail-pane" className="lg:col-span-7 space-y-4">
           {detailLoading ? (
             <div className="bg-white border border-[#E5E5E0] p-8 text-center text-xs text-[#555C68] font-mono shadow-subtle animate-pulse">
               Retrieving legal text from database...

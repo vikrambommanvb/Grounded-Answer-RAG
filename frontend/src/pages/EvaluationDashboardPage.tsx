@@ -161,29 +161,35 @@ export const EvaluationDashboardPage: React.FC = () => {
                 >
                   <div
                     onClick={() => setSelectedTestId(isExpanded ? null : tc.test_id)}
-                    className="pressable p-4 hover:bg-[#F8F8F5] cursor-pointer flex flex-wrap items-center justify-between gap-3 text-xs active:scale-[0.99]"
+                    className="pressable p-3.5 sm:p-4 hover:bg-[#F8F8F5] cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs active:scale-[0.99]"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className={`inline-flex items-center gap-1 font-mono text-[10px] px-1.5 py-0.2 border uppercase font-bold ${
-                        tc.passed
-                          ? 'bg-[#EFF8F7] text-[#137C72] border-[#B3DFDA]'
-                          : 'bg-[#FDF2F2] text-[#B94040] border-[#F6C1C1]'
-                      }`}>
-                        {tc.passed ? 'PASS' : 'FAIL'}
-                      </span>
-                      <span className="font-mono text-[11px] font-semibold text-[#171A21]">
-                        {tc.test_id}
-                      </span>
-                      <span className="meta-caps text-[#555C68] hidden sm:inline">
-                        {tc.category}
-                      </span>
+                    <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-flex items-center gap-1 font-mono text-[10px] px-1.5 py-0.2 border uppercase font-bold ${
+                          tc.passed
+                            ? 'bg-[#EFF8F7] text-[#137C72] border-[#B3DFDA]'
+                            : 'bg-[#FDF2F2] text-[#B94040] border-[#F6C1C1]'
+                        }`}>
+                          {tc.passed ? 'PASS' : 'FAIL'}
+                        </span>
+                        <span className="font-mono text-[11px] font-semibold text-[#171A21]">
+                          {tc.test_id}
+                        </span>
+                        <span className="meta-caps text-[#555C68] hidden md:inline">
+                          {tc.category}
+                        </span>
+                      </div>
+                      <div className="flex sm:hidden items-center gap-2 text-xs font-mono tnum text-[#555C68]">
+                        <span>{tc.latency_ms.toFixed(1)}ms</span>
+                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      </div>
                     </div>
 
                     <div className="flex-1 max-w-xl truncate text-xs text-[#252A32] font-serif not-italic">
                       {tc.question}
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs font-mono tnum text-[#555C68]">
+                    <div className="hidden sm:flex items-center gap-4 text-xs font-mono tnum text-[#555C68]">
                       <span>{tc.latency_ms.toFixed(1)}ms</span>
                       <span className="text-[#171A21]">{tc.actual_status}</span>
                       {isExpanded ? (
