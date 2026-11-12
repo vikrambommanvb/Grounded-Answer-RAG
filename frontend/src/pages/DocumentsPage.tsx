@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   FileText,
   CheckCircle2,
@@ -32,14 +33,14 @@ export const DocumentsPage: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Editorial Masthead */}
+      {/* Editorial Masthead with Specificity */}
       <div className="border-b border-[#E5E5E0] pb-5 space-y-2">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <div>
-            <span className="meta-caps text-[#777E89] block mb-1">
-              Archival Registry &bull; Cryptographic Provenance
+          <div className="space-y-1">
+            <span className="meta-caps text-[#555C68] block">
+              Archival Registry &bull; Cryptographic Integrity
             </span>
-            <h1 className="font-serif text-3xl font-semibold text-[#171A21] tracking-tight">
+            <h1 className="font-serif text-3xl font-semibold text-[#171A21] tracking-tight not-italic balance-text">
               Source Statutory Documents &amp; Checksums
             </h1>
           </div>
@@ -48,13 +49,13 @@ export const DocumentsPage: React.FC = () => {
             <span>SHA-256 Verified Immutable</span>
           </span>
         </div>
-        <p className="font-serif text-sm text-[#777E89] max-w-3xl leading-relaxed">
+        <p className="font-serif text-sm text-[#555C68] max-w-3xl leading-relaxed balance-text not-italic">
           The two official legal texts forming the exclusive and exhaustive Single Source of Truth.
           Cryptographically hashed and ingested into SQLite without modification or loss.
         </p>
       </div>
 
-      {/* Document Selection Cards */}
+      {/* Document Selection Cards with Scale 0.97 on press */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {documents?.map((doc) => {
           const isSelected = selectedDocId === doc.document_id;
@@ -64,7 +65,7 @@ export const DocumentsPage: React.FC = () => {
             <div
               key={doc.document_id}
               onClick={() => setSelectedDocId(doc.document_id)}
-              className={`p-5 bg-white border cursor-pointer transition-all space-y-3.5 shadow-subtle ${
+              className={`pressable p-5 bg-white border cursor-pointer transition-all space-y-3.5 shadow-subtle active:scale-[0.98] ${
                 isSelected
                   ? 'border-[#171A21] ring-1 ring-[#171A21]'
                   : 'border-[#E5E5E0] hover:border-[#171A21]'
@@ -80,11 +81,11 @@ export const DocumentsPage: React.FC = () => {
                     }`}>
                       {doc.document_type}
                     </span>
-                    <span className="meta-caps text-[#777E89]">
+                    <span className="meta-caps text-[#555C68]">
                       {doc.filename}
                     </span>
                   </div>
-                  <h3 className="font-serif text-base font-semibold text-[#171A21]">
+                  <h3 className="font-serif text-base font-semibold text-[#171A21] not-italic">
                     {doc.title}
                   </h3>
                 </div>
@@ -94,31 +95,31 @@ export const DocumentsPage: React.FC = () => {
               </div>
 
               {/* Metadata Rows */}
-              <div className="text-xs font-mono space-y-1.5 pt-2 border-t border-[#E5E5E0] text-[#252A32]">
+              <div className="text-xs font-mono tnum space-y-1.5 pt-2 border-t border-[#E5E5E0] text-[#252A32]">
                 <div className="flex items-center justify-between">
-                  <span className="text-[#777E89]">Effective Date:</span>
+                  <span className="text-[#555C68]">Effective Date:</span>
                   <span className="font-medium">{doc.effective_date}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[#777E89]">Ingested Provisions:</span>
+                  <span className="text-[#555C68]">Ingested Provisions:</span>
                   <span className="font-medium">{doc.clause_count} clauses</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[#777E89]">File Size:</span>
+                  <span className="text-[#555C68]">File Size:</span>
                   <span className="font-medium">{(doc.byte_size / 1024).toFixed(1)} KB</span>
                 </div>
               </div>
 
               {/* SHA-256 Checksum */}
               <div className="p-2.5 bg-[#F8F8F5] border border-[#E5E5E0] space-y-1">
-                <div className="flex items-center justify-between text-[10px] font-mono text-[#777E89]">
+                <div className="flex items-center justify-between text-[10px] font-mono text-[#555C68]">
                   <span className="meta-caps">SHA-256 Hash</span>
-                  <span className="text-[#137C72] flex items-center gap-1">
+                  <span className="text-[#137C72] flex items-center gap-1 font-medium">
                     <CheckCircle2 className="w-3 h-3" />
                     Verified
                   </span>
                 </div>
-                <p className="font-mono text-[10px] text-[#252A32] truncate select-all">
+                <p className="font-mono tnum text-[10px] text-[#252A32] truncate select-all">
                   {doc.sha256_hash}
                 </p>
               </div>
@@ -129,7 +130,7 @@ export const DocumentsPage: React.FC = () => {
 
       {/* Document Reader Container */}
       <div className="bg-white border border-[#E5E5E0] shadow-subtle overflow-hidden">
-        {/* Reader Header & Tab Switcher */}
+        {/* Reader Header & Tab Switcher with Shared layoutId */}
         <div className="p-4 border-b border-[#E5E5E0] bg-[#F8F8F5] flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="meta-caps text-[#171A21]">
@@ -138,27 +139,41 @@ export const DocumentsPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="inline-flex border border-[#E5E5E0] bg-white p-0.5 text-xs font-mono">
+            <div className="relative inline-flex border border-[#E5E5E0] bg-white p-0.5 text-xs font-mono">
               <button
                 type="button"
                 onClick={() => setViewMode('typeset')}
-                className={`px-2 py-0.5 transition-colors ${
+                className={`relative px-2.5 py-0.5 transition-colors z-10 pressable active:scale-[0.97] ${
                   viewMode === 'typeset'
-                    ? 'bg-[#171A21] text-white font-medium'
-                    : 'text-[#777E89] hover:text-[#171A21]'
+                    ? 'text-white font-medium'
+                    : 'text-[#555C68] hover:text-[#171A21]'
                 }`}
               >
+                {viewMode === 'typeset' && (
+                  <motion.div
+                    layoutId="docTabActive"
+                    className="absolute inset-0 bg-[#171A21] -z-10"
+                    transition={{ type: 'spring', bounce: 0, duration: 0.2 }}
+                  />
+                )}
                 Typeset Gazette
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('raw')}
-                className={`px-2 py-0.5 transition-colors ${
+                className={`relative px-2.5 py-0.5 transition-colors z-10 pressable active:scale-[0.97] ${
                   viewMode === 'raw'
-                    ? 'bg-[#171A21] text-white font-medium'
-                    : 'text-[#777E89] hover:text-[#171A21]'
+                    ? 'text-white font-medium'
+                    : 'text-[#555C68] hover:text-[#171A21]'
                 }`}
               >
+                {viewMode === 'raw' && (
+                  <motion.div
+                    layoutId="docTabActive"
+                    className="absolute inset-0 bg-[#171A21] -z-10"
+                    transition={{ type: 'spring', bounce: 0, duration: 0.2 }}
+                  />
+                )}
                 Verbatim Source
               </button>
             </div>
@@ -168,15 +183,15 @@ export const DocumentsPage: React.FC = () => {
         {/* Reader Content */}
         <div className="p-6 max-h-[640px] overflow-y-auto">
           {detailLoading ? (
-            <div className="p-12 text-center text-xs text-[#777E89] font-mono animate-pulse">
+            <div className="p-12 text-center text-xs text-[#555C68] font-mono animate-pulse">
               Reading official document bytes from disk...
             </div>
           ) : viewMode === 'typeset' ? (
-            <div className="prose max-w-none font-serif text-[15px] leading-relaxed text-[#171A21] space-y-4">
-              <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] text-xs font-mono text-[#777E89] mb-6">
+            <div className="prose max-w-none font-serif text-[15px] leading-relaxed text-[#171A21] space-y-4 not-italic">
+              <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] text-xs font-mono text-[#555C68] mb-6">
                 Official Gazette Notice &bull; Document ID: {selectedDocId} &bull; Effective: {docDetail?.effective_date}
               </div>
-              <div className="whitespace-pre-line leading-relaxed font-serif text-[15px] text-[#252A32] selection:bg-[#171A21] selection:text-white">
+              <div className="whitespace-pre-line leading-relaxed font-serif text-[15px] text-[#252A32] selection:bg-[#171A21] selection:text-white not-italic">
                 {docDetail?.raw_content}
               </div>
             </div>

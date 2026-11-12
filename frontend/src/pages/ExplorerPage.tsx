@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   Search,
   ArrowRight,
@@ -55,16 +56,16 @@ export const ExplorerPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Editorial Masthead */}
+      {/* Editorial Masthead with Specificity */}
       <div className="border-b border-[#E5E5E0] pb-5 flex flex-wrap items-baseline justify-between gap-4">
-        <div>
-          <span className="meta-caps text-[#777E89] block mb-1">
-            Official Statutory Code &bull; Calder County HSP
+        <div className="space-y-1">
+          <span className="meta-caps text-[#555C68] block">
+            Official Statutory Code &bull; Calder County Household Support Program
           </span>
-          <h1 className="font-serif text-3xl font-semibold text-[#171A21] tracking-tight">
-            Consolidated Policy Manual & Amendments
+          <h1 className="font-serif text-3xl font-semibold text-[#171A21] tracking-tight not-italic balance-text">
+            Consolidated Policy Manual &amp; Amendment Registry
           </h1>
-          <p className="text-xs text-[#777E89] mt-1 font-serif">
+          <p className="text-xs text-[#555C68] font-sans">
             12 Parts &bull; 54 Sections &bull; 148 Numbered Clauses &bull; Baseline as of 31 Dec 2025 with Amendment No. 2026-01
           </p>
         </div>
@@ -74,7 +75,7 @@ export const ExplorerPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowGraph(!showGraph)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 border text-xs font-mono transition-all active:scale-95 ${
+            className={`pressable inline-flex items-center gap-1.5 px-3 py-1.5 border text-xs font-mono transition-all active:scale-[0.97] ${
               showGraph
                 ? 'bg-[#171A21] text-white border-[#171A21]'
                 : 'bg-white text-[#171A21] border-[#E5E5E0] hover:bg-[#F8F8F5]'
@@ -84,7 +85,7 @@ export const ExplorerPage: React.FC = () => {
             <span>{showGraph ? 'Hide 3D Dependency Map' : 'Show 3D Dependency Map'}</span>
           </button>
 
-          <label className="inline-flex items-center gap-2 text-xs font-mono text-[#171A21] cursor-pointer select-none bg-white border border-[#E5E5E0] px-3 py-1.5 hover:bg-[#F8F8F5]">
+          <label className="pressable inline-flex items-center gap-2 text-xs font-mono text-[#171A21] cursor-pointer select-none bg-white border border-[#E5E5E0] px-3 py-1.5 hover:bg-[#F8F8F5] active:scale-[0.97]">
             <input
               type="checkbox"
               checked={amendedOnly}
@@ -119,14 +120,14 @@ export const ExplorerPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedPart(null)}
-                  className="font-mono text-[11px] text-[#3458DB] hover:underline"
+                  className="pressable font-mono text-[11px] text-[#3458DB] hover:underline active:scale-[0.97]"
                 >
                   All 12 Parts
                 </button>
               )}
             </div>
 
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 text-xs font-mono">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 text-xs font-mono tnum">
               {summary?.parts.map((p) => {
                 const isSelected = selectedPart === p.part_number;
                 return (
@@ -134,15 +135,22 @@ export const ExplorerPage: React.FC = () => {
                     key={p.part_number}
                     type="button"
                     onClick={() => setSelectedPart(isSelected ? null : p.part_number)}
-                    className={`p-2 border text-left transition-all ${
+                    className={`pressable relative p-2 border text-left transition-all active:scale-[0.97] ${
                       isSelected
                         ? 'bg-[#171A21] text-white border-[#171A21] font-semibold'
                         : 'bg-[#F8F8F5] text-[#252A32] border-[#E5E5E0] hover:bg-white hover:border-[#171A21]'
                     }`}
                     title={p.title}
                   >
+                    {isSelected && (
+                      <motion.div
+                        layoutId="activePartIndicator"
+                        className="absolute inset-0 bg-[#171A21] -z-10"
+                        transition={{ type: 'spring', bounce: 0, duration: 0.2 }}
+                      />
+                    )}
                     <div className="text-[10px] uppercase font-bold">{partRoman[p.part_number - 1]}</div>
-                    <div className="text-[9px] text-[#777E89] truncate">{p.clause_count} clauses</div>
+                    <div className={`text-[9px] truncate ${isSelected ? 'text-white/80' : 'text-[#555C68]'}`}>{p.clause_count} clauses</div>
                   </button>
                 );
               })}
@@ -152,7 +160,7 @@ export const ExplorerPage: React.FC = () => {
           {/* Search & Filter Bar */}
           <div className="bg-white border border-[#E5E5E0] p-3 space-y-2 shadow-subtle">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-[#777E89] absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-[#555C68] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
@@ -161,20 +169,20 @@ export const ExplorerPage: React.FC = () => {
                 className="w-full pl-8 pr-3 py-1.5 bg-[#F8F8F5] border border-[#E5E5E0] text-xs text-[#171A21] focus:outline-none focus:border-[#171A21] focus:bg-white transition-colors"
               />
             </div>
-            <div className="flex items-center justify-between text-[10px] font-mono text-[#777E89]">
+            <div className="flex items-center justify-between text-[10px] font-mono tnum text-[#555C68]">
               <span>Matching clauses: {filteredClauses.length}</span>
               {selectedPart && <span>Filtered by Part {selectedPart}</span>}
             </div>
           </div>
 
-          {/* Clause List Registry */}
+          {/* Clause List Registry with Staggered 30ms Rows */}
           <div className="bg-white border border-[#E5E5E0] shadow-subtle divide-y divide-[#E5E5E0] max-h-[580px] overflow-y-auto">
             {clausesLoading ? (
-              <div className="p-8 text-center text-xs text-[#777E89] font-mono">
+              <div className="p-8 text-center text-xs text-[#555C68] font-mono">
                 Indexing statutory clauses...
               </div>
             ) : filteredClauses.length === 0 ? (
-              <div className="p-8 text-center text-xs text-[#777E89]">
+              <div className="p-8 text-center text-xs text-[#555C68]">
                 No clauses match the query.
               </div>
             ) : (
@@ -184,7 +192,7 @@ export const ExplorerPage: React.FC = () => {
                   <div
                     key={clause.clause_id}
                     onClick={() => setSelectedClauseId(clause.clause_id)}
-                    className={`p-3 cursor-pointer transition-all space-y-1 ${
+                    className={`pressable p-3 cursor-pointer transition-all space-y-1 active:scale-[0.98] ${
                       isSelected
                         ? 'bg-[#F8F8F5] border-l-2 border-[#171A21] -ml-px pl-[11px]'
                         : 'hover:bg-[#F8F8F5]/60'
@@ -192,7 +200,7 @@ export const ExplorerPage: React.FC = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-semibold text-[#171A21]">
+                        <span className="font-mono tnum text-xs font-semibold text-[#171A21]">
                           {clause.clause_id}
                         </span>
                         {clause.is_amended && (
@@ -201,14 +209,14 @@ export const ExplorerPage: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <span className="font-mono text-[10px] text-[#777E89]">
+                      <span className="font-mono text-[10px] text-[#555C68]">
                         Part {clause.part_number}
                       </span>
                     </div>
                     <p className="font-medium text-xs text-[#252A32] truncate">
                       {clause.title}
                     </p>
-                    <p className="font-serif text-xs text-[#777E89] line-clamp-1">
+                    <p className="font-serif text-xs text-[#555C68] line-clamp-1 not-italic">
                       {clause.verbatim_text}
                     </p>
                   </div>
@@ -221,7 +229,7 @@ export const ExplorerPage: React.FC = () => {
         {/* Right Column: Verbatim Statutory Reading Pane & Diff (7 cols on lg) */}
         <div className="lg:col-span-7 space-y-4">
           {detailLoading ? (
-            <div className="bg-white border border-[#E5E5E0] p-8 text-center text-xs text-[#777E89] font-mono shadow-subtle animate-pulse">
+            <div className="bg-white border border-[#E5E5E0] p-8 text-center text-xs text-[#555C68] font-mono shadow-subtle animate-pulse">
               Retrieving legal text from database...
             </div>
           ) : clauseDetail ? (
@@ -229,7 +237,7 @@ export const ExplorerPage: React.FC = () => {
               {/* Clause Header */}
               <div className="border-b border-[#E5E5E0] pb-4 space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs px-2 py-0.5 bg-[#F8F8F5] border border-[#E5E5E0] text-[#171A21] font-semibold">
+                  <span className="font-mono tnum text-xs px-2 py-0.5 bg-[#F8F8F5] border border-[#E5E5E0] text-[#171A21] font-semibold">
                     {clauseDetail.clause_id}
                   </span>
                   {clauseDetail.is_amended && (
@@ -238,20 +246,20 @@ export const ExplorerPage: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <h2 className="font-serif text-2xl font-semibold text-[#171A21] leading-snug">
+                <h2 className="font-serif text-2xl font-semibold text-[#171A21] leading-snug balance-text not-italic">
                   {clauseDetail.title}
                 </h2>
-                <p className="text-xs text-[#777E89] font-serif">
+                <p className="text-xs text-[#555C68] font-sans">
                   Part {clauseDetail.part_number} &bull; Section {clauseDetail.section_number}: {clauseDetail.section_title}
                 </p>
               </div>
 
               {/* Verbatim Statutory Language */}
               <div className="space-y-2">
-                <span className="meta-caps text-[#777E89] block">
+                <span className="meta-caps text-[#555C68] block">
                   Verbatim Statutory Language
                 </span>
-                <div className="p-5 bg-[#F8F8F5] border border-[#E5E5E0] font-serif text-[15px] leading-relaxed text-[#171A21] selection:bg-[#171A21] selection:text-white">
+                <div className="p-5 bg-[#F8F8F5] border border-[#E5E5E0] font-serif text-[15px] leading-relaxed text-[#171A21] selection:bg-[#171A21] selection:text-white not-italic">
                   {clauseDetail.verbatim_text}
                 </div>
               </div>
@@ -263,7 +271,7 @@ export const ExplorerPage: React.FC = () => {
                     <span className="meta-caps text-[#137C72] flex items-center gap-1.5">
                       <span>Statutory Amendment Overlay</span>
                     </span>
-                    <span className="font-mono text-[10px] text-[#777E89]">
+                    <span className="font-mono tnum text-[10px] text-[#555C68]">
                       Effective: {clauseDetail.effective_date || '1 March 2026'}
                     </span>
                   </div>
@@ -274,7 +282,7 @@ export const ExplorerPage: React.FC = () => {
                       <span className="meta-caps text-[#B94040] block">
                         Pre-Amendment Baseline (2025)
                       </span>
-                      <p className="font-serif text-sm leading-relaxed text-[#252A32] line-through opacity-75">
+                      <p className="font-serif text-sm leading-relaxed text-[#252A32] line-through opacity-75 not-italic">
                         {clauseDetail.verbatim_text}
                       </p>
                     </div>
@@ -284,7 +292,7 @@ export const ExplorerPage: React.FC = () => {
                       <span className="meta-caps text-[#137C72] block">
                         Amended Rule (Post-1 March 2026)
                       </span>
-                      <p className="font-serif text-sm leading-relaxed text-[#171A21]">
+                      <p className="font-serif text-sm leading-relaxed text-[#171A21] not-italic">
                         {clauseDetail.amended_text}
                       </p>
                     </div>
@@ -308,7 +316,7 @@ export const ExplorerPage: React.FC = () => {
               {/* Statutory Cross-References */}
               {clauseDetail.cross_references && clauseDetail.cross_references.length > 0 && (
                 <div className="space-y-2 pt-3 border-t border-[#E5E5E0]">
-                  <span className="meta-caps text-[#777E89] block">
+                  <span className="meta-caps text-[#555C68] block">
                     Statutory Cross-References ({clauseDetail.cross_references.length})
                   </span>
                   <div className="flex flex-wrap gap-2">
@@ -317,7 +325,7 @@ export const ExplorerPage: React.FC = () => {
                         key={xref}
                         type="button"
                         onClick={() => setSelectedClauseId(xref)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono bg-[#F8F8F5] hover:bg-white border border-[#E5E5E0] hover:border-[#171A21] text-[#171A21] transition-all active:scale-95"
+                        className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono tnum bg-[#F8F8F5] hover:bg-white border border-[#E5E5E0] hover:border-[#171A21] text-[#171A21] transition-all active:scale-[0.97]"
                       >
                         <BookOpen className="w-3 h-3 opacity-60" />
                         <span>{xref}</span>
@@ -329,7 +337,7 @@ export const ExplorerPage: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="bg-white border border-[#E5E5E0] p-12 text-center text-xs text-[#777E89] shadow-subtle">
+            <div className="bg-white border border-[#E5E5E0] p-12 text-center text-xs text-[#555C68] shadow-subtle">
               Select a clause from the registry or 3D graph to view its verbatim statutory text.
             </div>
           )}

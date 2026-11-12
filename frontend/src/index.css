@@ -8,7 +8,7 @@
     --bg-warm: #F8F8F5;
     --ink: #171A21;
     --charcoal: #252A32;
-    --muted: #777E89;
+    --muted: #555C68;
     --border-fine: #E5E5E0;
     --accent-cobalt: #3458DB;
     --evidence-teal: #137C72;
@@ -18,30 +18,44 @@
 
   body {
     @apply antialiased text-[#171A21] bg-[#F8F8F5] min-h-screen font-sans;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
   }
 
   /* Optical Sizing & Editorial Typography */
   h1, h2, h3, .font-serif {
     font-optical-sizing: auto;
+    font-style: normal;
   }
 
-  /* Apple Design: Responsive pointer interactions */
-  button, a {
+  /* Apple Design: Responsive pointer interactions & scale 0.97 on press */
+  button, a, [role="button"] {
     touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pressable {
+    transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), opacity 120ms ease;
+  }
+  .pressable:active {
+    transform: scale(0.97);
+  }
+
+  /* Numbers with tabular figures for alignment */
+  .tnum, [data-tnum="true"] {
+    font-variant-numeric: tabular-nums;
   }
 
   /* Custom subtle scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
     background: #E5E5E0;
-    border-radius: 3px;
+    border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: #777E89;
@@ -57,6 +71,7 @@
   .editorial-serif {
     font-family: 'Newsreader', Georgia, serif;
     letter-spacing: -0.02em;
+    font-style: normal;
   }
 
   .meta-caps {
@@ -71,6 +86,29 @@
     font-family: 'Newsreader', Georgia, serif;
     line-height: 1.7;
     font-size: 0.9375rem;
+    font-style: normal;
+  }
+
+  /* Text wrap balance */
+  .balance-text {
+    text-wrap: balance;
+  }
+
+  /* Success Pulse Confirmation */
+  @keyframes success-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(19, 124, 114, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 6px rgba(19, 124, 114, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(19, 124, 114, 0);
+    }
+  }
+
+  .animate-success-pulse {
+    animation: success-pulse 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 

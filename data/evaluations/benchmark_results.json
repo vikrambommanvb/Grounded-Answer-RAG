@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-12T13:36:27.795749",
+  "timestamp": "2026-11-12T13:45:37.907308",
   "provider": "mock",
   "summary": {
     "total_tests": 10,
@@ -8,7 +8,7 @@
     "accuracy_percentage": 100.0,
     "refusal_correctness_percentage": 100.0,
     "citation_validity_percentage": 100.0,
-    "average_latency_ms": 2.84
+    "average_latency_ms": 1.81
   },
   "results": [
     {
@@ -21,7 +21,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 16.57,
+      "latency_ms": 8.42,
       "details": "Status: ANSWERED | Citations: 2 | Refusal: None"
     },
     {
@@ -34,7 +34,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 3.26,
+      "latency_ms": 1.39,
       "details": "Status: ANSWERED_WITH_WARNING | Citations: 3 | Refusal: None"
     },
     {
@@ -47,7 +47,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.97,
+      "latency_ms": 1.38,
       "details": "Status: ANSWERED_WITH_WARNING | Citations: 2 | Refusal: None"
     },
     {
@@ -60,7 +60,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.35,
+      "latency_ms": 1.49,
       "details": "Status: ANSWERED | Citations: 2 | Refusal: None"
     },
     {
@@ -73,7 +73,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.76,
+      "latency_ms": 1.86,
       "details": "Status: ANSWERED_WITH_WARNING | Citations: 2 | Refusal: None"
     },
     {
@@ -86,7 +86,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 1.48,
+      "latency_ms": 1.51,
       "details": "Status: ANSWERED_WITH_WARNING | Citations: 1 | Refusal: None"
     },
     {
@@ -99,7 +99,7 @@
       "status_passed": true,
       "citation_passed": true,
       "phrases_passed": true,
-      "latency_ms": 0.59,
+      "latency_ms": 0.6,
       "details": "Status: REFUSED | Citations: 0 | Refusal: INTERNAL_CONFLICT"
     },
     {

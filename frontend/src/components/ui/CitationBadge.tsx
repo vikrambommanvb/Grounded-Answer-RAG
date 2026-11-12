@@ -14,7 +14,7 @@ export const CitationBadge: React.FC<CitationBadgeProps> = ({ badge, onClick }) 
     <button
       type="button"
       onClick={() => isClickable && onClick(badge.clause_id)}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono transition-all border active:scale-[0.97] ${
+      className={`pressable inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono tnum transition-all border active:scale-[0.97] ${
         badge.is_amended
           ? 'bg-[#EFF8F7] border-[#B3DFDA] text-[#137C72] hover:border-[#137C72] hover:bg-[#E5F5F3]'
           : 'bg-[#F8F8F5] border-[#E5E5E0] text-[#171A21] hover:border-[#3458DB] hover:text-[#3458DB] hover:bg-white'

@@ -25,29 +25,35 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
     <AnimatePresence>
       {clauseId && (
         <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
-          {/* Backdrop Scrim */}
+          {/* Backdrop Scrim (250ms in, 200ms out) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             onClick={onClose}
             className="fixed inset-0 bg-[#171A21]/40 backdrop-blur-xs"
           />
 
-          {/* Slide-over Drawer with Apple-Style Spring */}
+          {/* Slide-over Drawer: Critically damped (bounce: 0), 250ms entrance, 200ms exit */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300, mass: 0.8 }}
+            transition={{
+              type: 'spring',
+              bounce: 0,
+              damping: 32,
+              stiffness: 320,
+              mass: 0.8,
+            }}
             className="relative w-full max-w-2xl bg-white border-l border-[#E5E5E0] h-full shadow-floating flex flex-col z-10"
           >
             {/* Drawer Header */}
             <div className="p-6 border-b border-[#E5E5E0] flex items-start justify-between bg-[#F8F8F5]">
               <div className="space-y-1.5 pr-6">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs px-2 py-0.5 bg-white border border-[#E5E5E0] text-[#171A21] font-semibold">
+                  <span className="font-mono tnum text-xs px-2 py-0.5 bg-white border border-[#E5E5E0] text-[#171A21] font-semibold">
                     {clauseId}
                   </span>
                   {clause?.is_amended && (
@@ -56,11 +62,11 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
                     </span>
                   )}
                 </div>
-                <h2 className="font-serif text-lg font-semibold text-[#171A21] leading-snug">
+                <h2 className="font-serif text-lg font-semibold text-[#171A21] leading-snug balance-text not-italic">
                   {clause?.title || 'Loading statutory text...'}
                 </h2>
                 {clause && (
-                  <p className="text-xs text-[#777E89]">
+                  <p className="text-xs text-[#555C68] font-sans">
                     Part {clause.part_number} &bull; Section {clause.section_number}: {clause.section_title}
                   </p>
                 )}
@@ -69,7 +75,7 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1.5 text-[#777E89] hover:text-[#171A21] hover:bg-[#E5E5E0]/50 transition-colors active:scale-95"
+                className="pressable p-1.5 text-[#555C68] hover:text-[#171A21] hover:bg-[#E5E5E0]/50 transition-colors active:scale-[0.97]"
                 aria-label="Close drawer"
               >
                 <X className="w-5 h-5" />
@@ -79,7 +85,7 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
             {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {isLoading && (
-                <div className="p-8 text-center text-xs text-[#777E89] font-mono animate-pulse">
+                <div className="p-8 text-center text-xs text-[#555C68] font-mono animate-pulse">
                   Retrieving verbatim text from database...
                 </div>
               )}
@@ -98,10 +104,10 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
                 <>
                   {/* Verbatim Statutory Language */}
                   <div className="space-y-2">
-                    <span className="meta-caps text-[#777E89] block">
+                    <span className="meta-caps text-[#555C68] block">
                       Verbatim Statutory Language
                     </span>
-                    <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] font-serif text-[15px] leading-relaxed text-[#171A21]">
+                    <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] font-serif text-[15px] leading-relaxed text-[#171A21] not-italic">
                       {clause.verbatim_text}
                     </div>
                   </div>
@@ -113,7 +119,7 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
                         <span className="meta-caps text-[#137C72] flex items-center gap-1.5">
                           <span>Amendment Overlay Comparison</span>
                         </span>
-                        <span className="font-mono text-[10px] text-[#777E89]">
+                        <span className="font-mono tnum text-[10px] text-[#555C68]">
                           Effective: {clause.effective_date || '1 March 2026'}
                         </span>
                       </div>
@@ -124,7 +130,7 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
                           <span className="meta-caps text-[#B94040] block">
                             Historical Text (Pre-March 2026)
                           </span>
-                          <p className="font-serif text-sm leading-relaxed text-[#252A32] line-through opacity-80">
+                          <p className="font-serif text-sm leading-relaxed text-[#252A32] line-through opacity-80 not-italic">
                             {clause.verbatim_text}
                           </p>
                         </div>
@@ -134,7 +140,7 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
                           <span className="meta-caps text-[#137C72] block">
                             Amended Text (Post-March 2026)
                           </span>
-                          <p className="font-serif text-sm leading-relaxed text-[#171A21]">
+                          <p className="font-serif text-sm leading-relaxed text-[#171A21] not-italic">
                             {clause.amended_text}
                           </p>
                         </div>
@@ -158,7 +164,7 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
                   {/* Statutory Cross-References */}
                   {clause.cross_references && clause.cross_references.length > 0 && (
                     <div className="space-y-2 pt-3 border-t border-[#E5E5E0]">
-                      <span className="meta-caps text-[#777E89] block">
+                      <span className="meta-caps text-[#555C68] block">
                         Statutory Cross-References ({clause.cross_references.length})
                       </span>
                       <div className="flex flex-wrap gap-2">
@@ -167,7 +173,7 @@ export const ClauseDrawer: React.FC<ClauseDrawerProps> = ({
                             key={xref}
                             type="button"
                             onClick={() => onSelectClause && onSelectClause(xref)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono bg-[#F8F8F5] hover:bg-white border border-[#E5E5E0] hover:border-[#3458DB] text-[#171A21] hover:text-[#3458DB] transition-all active:scale-95"
+                            className="pressable inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono tnum bg-[#F8F8F5] hover:bg-white border border-[#E5E5E0] hover:border-[#3458DB] text-[#171A21] hover:text-[#3458DB] transition-all active:scale-[0.97]"
                           >
                             <BookOpen className="w-3 h-3 opacity-60" />
                             <span>{xref}</span>

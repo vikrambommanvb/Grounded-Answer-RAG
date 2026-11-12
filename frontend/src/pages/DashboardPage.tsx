@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   MessageSquareText,
   BookOpen,
-  ShieldCheck,
   ArrowRight,
+  ShieldCheck,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPolicySummary, fetchHealth, fetchEvaluationSummary } from '../services/api';
@@ -93,24 +94,40 @@ export const DashboardPage: React.FC = () => {
     });
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.03, // Stagger list rows by 30ms
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 6 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" as const } },
+  };
+
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Editorial Masthead */}
-      <div className="border-b border-[#E5E5E0] pb-6 space-y-2">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <div>
-            <span className="meta-caps text-[#777E89] block mb-1">
-              Department of Social Services &bull; Calder County, New York
+      {/* Editorial Masthead with Specificity & Balanced Wrap */}
+      <div className="border-b border-[#E5E5E0] pb-6 space-y-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-4">
+          <div className="space-y-1">
+            <span className="meta-caps text-[#555C68] block">
+              Calder County Department of Social Services &bull; HSP Policy Division
             </span>
-            <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#171A21]">
-              Household Support Program Policy Registry
+            <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#171A21] not-italic balance-text">
+              Statutory Adjudication Registry &amp; Policy Docket
             </h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            {/* Emphasized Primary CTA */}
             <button
               type="button"
               onClick={() => navigate('/assistant')}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-[#171A21] hover:bg-[#252A32] text-white text-xs font-medium transition-all active:scale-[0.98] shadow-subtle"
+              className="pressable inline-flex items-center gap-2 px-4 py-2 bg-[#171A21] hover:bg-[#252A32] text-white text-xs font-semibold tracking-wide transition-all active:scale-[0.97] shadow-subtle"
             >
               <MessageSquareText className="w-3.5 h-3.5" />
               <span>Launch Casework Assistant</span>
@@ -118,86 +135,92 @@ export const DashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/explorer')}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-[#F8F8F5] border border-[#E5E5E0] text-[#171A21] text-xs font-medium transition-all active:scale-[0.98]"
+              className="pressable inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-[#F8F8F5] border border-[#E5E5E0] text-[#171A21] text-xs font-medium transition-all active:scale-[0.97]"
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <BookOpen className="w-3.5 h-3.5 text-[#555C68]" />
               <span>Browse Manual</span>
             </button>
           </div>
         </div>
-        <p className="font-serif text-sm text-[#777E89] max-w-3xl leading-relaxed">
-          Authoritative casework intelligence system operating under the Single Source of Truth doctrine.
-          Consolidated Policy Manual (31 Dec 2025) with Amendment No. 2026-01 (effective 1 March 2026).
+        <p className="font-serif text-sm text-[#555C68] max-w-3xl leading-relaxed balance-text not-italic">
+          Evidence-grounded statutory determination assistant operating under the Single Source of Truth doctrine.
+          Enforces consolidated Policy Manual rules (31 Dec 2025) and Amendment No. 2026-01 (effective 1 March 2026).
         </p>
       </div>
 
-      {/* Structured Ledger Statistics (Editorial Grid, not bubbly cards) */}
+      {/* Structured Ledger Statistics (Grouped with spacing, Tabular figures) */}
       <div className="border border-[#E5E5E0] bg-white divide-y sm:divide-y-0 sm:divide-x divide-[#E5E5E0] grid grid-cols-2 lg:grid-cols-4 shadow-subtle">
         <div className="p-4 sm:p-5 space-y-1">
-          <span className="meta-caps text-[#777E89] block">Statutory Corpus</span>
-          <div className="font-mono text-2xl font-semibold text-[#171A21]">
+          <span className="meta-caps text-[#555C68] block">Statutory Corpus</span>
+          <div className="font-mono tnum text-2xl font-semibold text-[#171A21]">
             {summary?.total_clauses || 148}
           </div>
-          <p className="text-[11px] text-[#777E89]">
+          <p className="text-[11px] text-[#555C68]">
             Numbered clauses across {summary?.total_parts || 12} policy parts
           </p>
         </div>
 
         <div className="p-4 sm:p-5 space-y-1">
-          <span className="meta-caps text-[#777E89] block">Transitional Rules</span>
-          <div className="font-mono text-2xl font-semibold text-[#137C72]">
+          <span className="meta-caps text-[#555C68] block">Transitional Rules</span>
+          <div className="font-mono tnum text-2xl font-semibold text-[#137C72]">
             Paras 5.1 &ndash; 5.3
           </div>
-          <p className="text-[11px] text-[#777E89]">
+          <p className="text-[11px] text-[#555C68]">
             Effective 1 March 2026 with daily apportionment
           </p>
         </div>
 
         <div className="p-4 sm:p-5 space-y-1">
-          <span className="meta-caps text-[#777E89] block">Benchmark Fidelity</span>
-          <div className="font-mono text-2xl font-semibold text-[#171A21]">
+          <span className="meta-caps text-[#555C68] block">Benchmark Fidelity</span>
+          <div className="font-mono tnum text-2xl font-semibold text-[#171A21]">
             {evalSummary ? `${evalSummary.accuracy_percentage.toFixed(0)}%` : '100%'}
           </div>
-          <p className="text-[11px] text-[#777E89]">
+          <p className="text-[11px] text-[#555C68]">
             10/10 statutory tests verified without hallucination
           </p>
         </div>
 
         <div className="p-4 sm:p-5 space-y-1">
-          <span className="meta-caps text-[#777E89] block">Reasoning Engine</span>
+          <span className="meta-caps text-[#555C68] block">Reasoning Engine</span>
           <div className="font-mono text-2xl font-semibold text-[#3458DB]">
             {health?.default_provider === 'groq' ? 'Groq 27B' : 'Deterministic'}
           </div>
-          <p className="text-[11px] text-[#777E89]">
+          <p className="text-[11px] text-[#555C68]">
             Zero temperature modal fidelity &bull; Offline safe
           </p>
         </div>
       </div>
 
-      {/* Operational Case Scenarios Section */}
+      {/* Operational Case Scenarios Section with 30ms Stagger */}
       <div className="space-y-4">
         <div className="flex items-baseline justify-between border-b border-[#E5E5E0] pb-2">
           <div>
-            <h2 className="font-serif text-lg font-semibold text-[#171A21]">
+            <h2 className="font-serif text-lg font-semibold text-[#171A21] not-italic">
               Authoritative Casework Inquiries
             </h2>
-            <p className="text-xs text-[#777E89]">
-              Representative scenarios demonstrating statutory grounding, temporal date rules, and responsible refusal protocols.
+            <p className="text-xs text-[#555C68]">
+              Standardized inquiries testing statutory grounding, temporal determination rules, and refusal protocols.
             </p>
           </div>
-          <span className="meta-caps text-[#777E89] hidden sm:inline">6 Verifiable Scenarios</span>
+          <span className="meta-caps text-[#555C68] hidden sm:inline">6 Verifiable Scenarios</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5"
+        >
           {scenarios.map((s) => (
-            <div
+            <motion.div
               key={s.id}
+              variants={itemVariants}
               onClick={() => handleLaunchScenario(s)}
-              className="p-4 bg-white border border-[#E5E5E0] hover:border-[#171A21] cursor-pointer transition-all space-y-3 group active:scale-[0.99] shadow-subtle flex flex-col justify-between"
+              className="pressable p-4 bg-white border border-[#E5E5E0] hover:border-[#171A21] cursor-pointer transition-all space-y-3 group active:scale-[0.97] shadow-subtle flex flex-col justify-between"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] text-[#171A21] font-semibold px-1.5 py-0.2 bg-[#F8F8F5] border border-[#E5E5E0]">
+                  <span className="font-mono tnum text-[10px] text-[#171A21] font-semibold px-1.5 py-0.2 bg-[#F8F8F5] border border-[#E5E5E0]">
                     {s.clause}
                   </span>
                   <span className={`text-[9px] font-mono px-1.5 py-0.2 uppercase font-medium ${
@@ -211,22 +234,22 @@ export const DashboardPage: React.FC = () => {
                   </span>
                 </div>
 
-                <h3 className="font-serif text-sm font-semibold text-[#171A21] leading-snug group-hover:text-[#3458DB] transition-colors">
+                <h3 className="font-serif text-sm font-semibold text-[#171A21] leading-snug group-hover:text-[#3458DB] transition-colors not-italic">
                   {s.title}
                 </h3>
 
-                <p className="text-xs text-[#777E89] line-clamp-2 leading-relaxed">
+                <p className="text-xs text-[#555C68] line-clamp-2 leading-relaxed">
                   {s.desc}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-[#E5E5E0] flex items-center justify-between text-[11px] text-[#777E89] font-mono group-hover:text-[#171A21]">
+              <div className="pt-2 border-t border-[#E5E5E0] flex items-center justify-between text-[11px] text-[#555C68] font-mono group-hover:text-[#171A21]">
                 <span>Submit to Engine</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
       {/* Statutory Architecture Summary Section */}
@@ -234,37 +257,37 @@ export const DashboardPage: React.FC = () => {
         <div className="border-b border-[#E5E5E0] pb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-[#137C72]" />
-            <h3 className="font-serif text-base font-semibold text-[#171A21]">
+            <h3 className="font-serif text-base font-semibold text-[#171A21] not-italic">
               Casework Compliance Architecture
             </h3>
           </div>
-          <span className="meta-caps text-[#777E89]">Verified Docket Protocol</span>
+          <span className="meta-caps text-[#555C68]">Verified Docket Protocol</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs text-[#252A32]">
           <div className="space-y-1.5">
-            <h4 className="font-semibold text-[#171A21] font-serif text-sm">
+            <h4 className="font-semibold text-[#171A21] font-serif text-sm not-italic">
               1. Effective-Dated Overlay
             </h4>
-            <p className="text-[#777E89] leading-relaxed">
+            <p className="text-[#555C68] leading-relaxed">
               Amendment No. 2026-01 applies prospectively from 1 March 2026. Pre-amendment claims retain historical 2025 rates. Spanning claims are apportioned daily under §7.4.3 without flat rounding.
             </p>
           </div>
 
           <div className="space-y-1.5">
-            <h4 className="font-semibold text-[#171A21] font-serif text-sm">
+            <h4 className="font-semibold text-[#171A21] font-serif text-sm not-italic">
               2. Doctrine of Responsible Refusal
             </h4>
-            <p className="text-[#777E89] leading-relaxed">
+            <p className="text-[#555C68] leading-relaxed">
               The engine refuses queries with missing dates (<span className="font-mono text-[10px]">MISSING_TEMPORAL_DATA</span>), statutory gaps like §7.1.3 (<span className="font-mono text-[10px]">APPARENT_GAP</span>), and pre-amendment reporting conflicts (<span className="font-mono text-[10px]">INTERNAL_CONFLICT</span>).
             </p>
           </div>
 
           <div className="space-y-1.5">
-            <h4 className="font-semibold text-[#171A21] font-serif text-sm">
+            <h4 className="font-semibold text-[#171A21] font-serif text-sm not-italic">
               3. Verbatim Traceability
             </h4>
-            <p className="text-[#777E89] leading-relaxed">
+            <p className="text-[#555C68] leading-relaxed">
               Every factual assertion cites verified clause identifiers stored in SQLite. Hallucinated citations are detected and rejected prior to presentation.
             </p>
           </div>
