@@ -13,11 +13,26 @@ import {
 
 /**
  * Resolves the backend API base endpoint URL:
- * - Production on Vercel: reads VITE_API_BASE_URL (e.g. 'https://grounded-answer-rag.onrender.com')
- *   and ensures '/api' is appended without duplication.
- * - Local development / missing env: safely falls back to '/api' to use Vite's dev proxy (http://127.0.0.1:8000).
+ * - On Vercel (grounded-answer-rag.vercel.app) or local development:
+ *   Always routes through the edge / dev proxy ('/api') to eliminate Safari CORS "Load failed" errors,
+ *   remove preflight OPTIONS latency, and ensure reliable proxying to Render.
+ * - If explicitly configured with an alternative external host, normalizes and uses it.
  */
 const getApiBase = (): string => {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    // When running on Vercel or localhost, prioritize same-origin '/api' proxy
+    if (host.includes('vercel.app') || host === 'localhost' || host === '127.0.0.1') {
+      const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
+      // Allow override only if not the Render backend (which is handled by vercel.json)
+      if (envUrl && !envUrl.includes('onrender.com') && envUrl !== '/api') {
+        const cleanUrl = envUrl.replace(/\/+$/, '');
+        return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+      }
+      return '/api';
+    }
+  }
+
   const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
   if (!envUrl) {
     return '/api';
