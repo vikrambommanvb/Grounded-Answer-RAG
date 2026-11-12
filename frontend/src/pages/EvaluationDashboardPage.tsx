@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import {
-  FileCheck2,
   Play,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Sparkles,
   ChevronDown,
   ChevronUp,
-  AlertTriangle,
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchEvaluationSummary, runEvaluation } from '../services/api';
@@ -18,7 +12,7 @@ export const EvaluationDashboardPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
 
-  const { data: summary } = useQuery<EvaluationSummary>({
+  const { data: summary, isLoading } = useQuery<EvaluationSummary>({
     queryKey: ['evaluationSummary'],
     queryFn: fetchEvaluationSummary,
   });
@@ -38,19 +32,18 @@ export const EvaluationDashboardPage: React.FC = () => {
   const hasResults = summary && summary.total_tests > 0;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
+    <div className="space-y-8 max-w-6xl mx-auto">
+      {/* Editorial Masthead */}
+      <div className="border-b border-[#E5E5E0] pb-5 flex flex-wrap items-baseline justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-semibold mb-1">
-            <FileCheck2 className="w-3.5 h-3.5 text-blue-600" />
-            <span>Automated Casework Quality Benchmark</span>
-          </div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Ten-Question Statutory Benchmark Suite
+          <span className="meta-caps text-[#777E89] block mb-1">
+            Quality Assurance &bull; Statutory Grounding Laboratory
+          </span>
+          <h1 className="font-serif text-3xl font-semibold text-[#171A21] tracking-tight">
+            Ten-Question Benchmark Evaluation Suite
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Rigorous evaluation of factual correctness, temporal resolution, citation integrity, and refusal fidelity.
+          <p className="text-xs text-[#777E89] mt-1 font-serif">
+            Empirical audit of factual accuracy, temporal rule resolution, citation provenance, and refusal calibration.
           </p>
         </div>
 
@@ -58,173 +51,151 @@ export const EvaluationDashboardPage: React.FC = () => {
           type="button"
           onClick={handleRun}
           disabled={isRunning}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold shadow-xs transition-colors shrink-0"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#171A21] hover:bg-[#252A32] disabled:opacity-50 text-white text-xs font-medium transition-all active:scale-95 shadow-subtle shrink-0"
         >
           {isRunning ? (
             <>
-              <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent" />
-              <span>Executing 10 Tests...</span>
+              <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent" />
+              <span>Executing 10 Benchmark Tests...</span>
             </>
           ) : (
             <>
-              <Play className="w-3.5 h-3.5" />
-              <span>Run Benchmark Now</span>
+              <Play className="w-3 h-3" />
+              <span>Run Automated Benchmark</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Metrics Scorecards */}
-      {hasResults ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>Overall Accuracy</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            </div>
-            <p className="text-2xl font-bold text-slate-900 font-mono">
+      {/* Metrics Scorecards (Editorial Ledger Grid) */}
+      {hasResults && (
+        <div className="border border-[#E5E5E0] bg-white divide-y sm:divide-y-0 sm:divide-x divide-[#E5E5E0] grid grid-cols-2 lg:grid-cols-4 shadow-subtle">
+          <div className="p-4 sm:p-5 space-y-1">
+            <span className="meta-caps text-[#777E89] block">Overall Accuracy</span>
+            <div className="font-mono text-2xl font-semibold text-[#137C72]">
               {summary.accuracy_percentage.toFixed(1)}%
-            </p>
-            <p className="text-[11px] text-slate-500">
-              {summary.passed_tests} of {summary.total_tests} test cases passed
+            </div>
+            <p className="text-[11px] text-[#777E89]">
+              {summary.passed_tests}/{summary.total_tests} test cases passed
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>Citation Validity</span>
-              <Sparkles className="w-4 h-4 text-blue-600" />
-            </div>
-            <p className="text-2xl font-bold text-slate-900 font-mono">
+          <div className="p-4 sm:p-5 space-y-1">
+            <span className="meta-caps text-[#777E89] block">Citation Integrity</span>
+            <div className="font-mono text-2xl font-semibold text-[#171A21]">
               {summary.citation_validity_percentage.toFixed(1)}%
-            </p>
-            <p className="text-[11px] text-slate-500">
-              Verified statutory clause provenance
+            </div>
+            <p className="text-[11px] text-[#777E89]">
+              Zero hallucinated clause identifiers
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>Refusal Fidelity</span>
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
-            </div>
-            <p className="text-2xl font-bold text-slate-900 font-mono">
+          <div className="p-4 sm:p-5 space-y-1">
+            <span className="meta-caps text-[#777E89] block">Refusal Correctness</span>
+            <div className="font-mono text-2xl font-semibold text-[#137C72]">
               {summary.refusal_correctness_percentage.toFixed(1)}%
-            </p>
-            <p className="text-[11px] text-slate-500">
-              Zero hallucination on gaps & contradictions
+            </div>
+            <p className="text-[11px] text-[#777E89]">
+              Caught gap &amp; contradiction traps
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>Average Latency</span>
-              <Clock className="w-4 h-4 text-purple-600" />
+          <div className="p-4 sm:p-5 space-y-1">
+            <span className="meta-caps text-[#777E89] block">Execution Latency</span>
+            <div className="font-mono text-2xl font-semibold text-[#3458DB]">
+              {summary.average_latency_ms.toFixed(2)} ms
             </div>
-            <p className="text-2xl font-bold text-slate-900 font-mono">
-              {summary.average_latency_ms.toFixed(1)} ms
-            </p>
-            <p className="text-[11px] text-slate-500">
-              Deterministic offline benchmark timing
+            <p className="text-[11px] text-[#777E89]">
+              Deterministic in-memory evaluation
             </p>
           </div>
-        </div>
-      ) : (
-        <div className="p-8 rounded-xl bg-white border border-slate-200 shadow-xs text-center space-y-3">
-          <p className="text-sm font-semibold text-slate-800">No benchmark results recorded yet</p>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Click &quot;Run Benchmark Now&quot; above to execute the 10-Question suite across the live engine.
-          </p>
         </div>
       )}
 
-      {/* Test Matrix Table */}
-      {hasResults && (
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-          <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-800">
-              Benchmark Test Matrix (10 Test Cases)
-            </h2>
-            <span className="text-[11px] text-slate-400 font-mono">
-              SQLite Recorded Execution
-            </span>
-          </div>
+      {/* Benchmark Test Cases Table */}
+      <div className="bg-white border border-[#E5E5E0] shadow-subtle overflow-hidden">
+        <div className="p-4 border-b border-[#E5E5E0] bg-[#F8F8F5] flex items-center justify-between">
+          <h2 className="meta-caps text-[#171A21]">
+            Automated Audit Test Registry (10 Statutory Scenarios)
+          </h2>
+          <span className="font-mono text-[10px] text-[#777E89]">
+            Source: data/evaluations/benchmark_results.json
+          </span>
+        </div>
 
-          <div className="divide-y divide-slate-100">
-            {summary.results.map((r) => {
-              const isExpanded = selectedTestId === r.test_id;
+        {isLoading ? (
+          <div className="p-8 text-center text-xs text-[#777E89] font-mono">
+            Loading benchmark test results...
+          </div>
+        ) : summary?.results ? (
+          <div className="divide-y divide-[#E5E5E0]">
+            {summary.results.map((tc) => {
+              const isExpanded = selectedTestId === tc.test_id;
               return (
-                <div key={r.test_id} className="transition-colors hover:bg-slate-50/60">
+                <div key={tc.test_id} className="transition-colors">
                   <div
-                    onClick={() => setSelectedTestId(isExpanded ? null : r.test_id)}
-                    className="p-4 cursor-pointer flex flex-wrap items-center justify-between gap-3"
+                    onClick={() => setSelectedTestId(isExpanded ? null : tc.test_id)}
+                    className="p-4 hover:bg-[#F8F8F5] cursor-pointer flex flex-wrap items-center justify-between gap-3 text-xs"
                   >
                     <div className="flex items-center gap-3">
-                      {r.passed ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-red-600 shrink-0" />
-                      )}
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-slate-900">
-                            {r.test_id}
-                          </span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">
-                            {r.category}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-700 mt-0.5 line-clamp-1 max-w-xl">
-                          {r.question}
-                        </p>
-                      </div>
+                      <span className={`inline-flex items-center gap-1 font-mono text-[10px] px-1.5 py-0.2 border uppercase font-bold ${
+                        tc.passed
+                          ? 'bg-[#EFF8F7] text-[#137C72] border-[#B3DFDA]'
+                          : 'bg-[#FDF2F2] text-[#B94040] border-[#F6C1C1]'
+                      }`}>
+                        {tc.passed ? 'PASS' : 'FAIL'}
+                      </span>
+                      <span className="font-mono text-[11px] font-semibold text-[#171A21]">
+                        {tc.test_id}
+                      </span>
+                      <span className="meta-caps text-[#777E89] hidden sm:inline">
+                        {tc.category}
+                      </span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs">
-                      <span className="font-mono text-[11px] text-slate-500">
-                        {r.latency_ms.toFixed(1)} ms
-                      </span>
-                      <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold uppercase ${
-                          r.passed
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {r.passed ? 'PASSED' : 'FAILED'}
-                      </span>
+                    <div className="flex-1 max-w-xl truncate text-xs text-[#252A32] font-serif">
+                      {tc.question}
+                    </div>
+
+                    <div className="flex items-center gap-4 text-xs font-mono text-[#777E89]">
+                      <span>{tc.latency_ms.toFixed(1)}ms</span>
+                      <span className="text-[#171A21]">{tc.actual_status}</span>
                       {isExpanded ? (
-                        <ChevronUp className="w-4 h-4 text-slate-400" />
+                        <ChevronUp className="w-3.5 h-3.5" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-slate-400" />
+                        <ChevronDown className="w-3.5 h-3.5" />
                       )}
                     </div>
                   </div>
 
-                  {/* Expanded Row Details */}
+                  {/* Expandable Diagnostic Evidence */}
                   {isExpanded && (
-                    <div className="px-5 pb-5 pt-1 space-y-3 bg-slate-50/80 border-t border-slate-100 text-xs">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                        <div className="p-3 rounded-lg bg-white border border-slate-200 space-y-1">
-                          <span className="text-[10px] font-semibold text-slate-400 uppercase">
-                            Expected Status
+                    <div className="p-4 bg-[#F8F8F5] border-t border-[#E5E5E0] space-y-3 text-xs font-mono">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="p-3 bg-white border border-[#E5E5E0] space-y-1">
+                          <span className="text-[10px] text-[#777E89] uppercase block">Status Match</span>
+                          <span className={tc.status_passed ? 'text-[#137C72]' : 'text-[#B94040]'}>
+                            Expected: {tc.expected_status} &bull; Actual: {tc.actual_status}
                           </span>
-                          <p className="font-mono text-slate-900">{r.expected_status}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-white border border-slate-200 space-y-1">
-                          <span className="text-[10px] font-semibold text-slate-400 uppercase">
-                            Actual Status
+                        <div className="p-3 bg-white border border-[#E5E5E0] space-y-1">
+                          <span className="text-[10px] text-[#777E89] uppercase block">Citation Provenance</span>
+                          <span className={tc.citation_passed ? 'text-[#137C72]' : 'text-[#B94040]'}>
+                            {tc.citation_passed ? 'Verified Valid Clauses' : 'Citation Discrepancy'}
                           </span>
-                          <p className="font-mono text-slate-900">{r.actual_status}</p>
+                        </div>
+                        <div className="p-3 bg-white border border-[#E5E5E0] space-y-1">
+                          <span className="text-[10px] text-[#777E89] uppercase block">Phrase / Keyword Fidelity</span>
+                          <span className={tc.phrases_passed ? 'text-[#137C72]' : 'text-[#B94040]'}>
+                            {tc.phrases_passed ? 'All Required Terms Present' : 'Missing Phrases'}
+                          </span>
                         </div>
                       </div>
 
-                      <div className="p-3 rounded-lg bg-white border border-slate-200 space-y-1">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase">
-                          Execution Diagnostics
-                        </span>
-                        <p className="font-mono text-slate-700 text-[11px] leading-relaxed">
-                          {r.details}
+                      <div className="p-3 bg-white border border-[#E5E5E0] space-y-1">
+                        <span className="text-[10px] text-[#777E89] uppercase block">Diagnostic Audit Log</span>
+                        <p className="text-[#252A32] leading-relaxed whitespace-pre-wrap">
+                          {tc.details}
                         </p>
                       </div>
                     </div>
@@ -233,8 +204,12 @@ export const EvaluationDashboardPage: React.FC = () => {
               );
             })}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="p-8 text-center text-xs text-[#777E89]">
+            Click &quot;Run Automated Benchmark&quot; to execute the 10 statutory test cases.
+          </div>
+        )}
+      </div>
     </div>
   );
 };

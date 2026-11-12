@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import {
   FileText,
-  Hash,
-  Eye,
   CheckCircle2,
+  ShieldCheck,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchDocuments, fetchDocumentDetail } from '../services/api';
 
 export const DocumentsPage: React.FC = () => {
   const [selectedDocId, setSelectedDocId] = useState<string>('policy-manual');
+  const [viewMode, setViewMode] = useState<'typeset' | 'raw'>('typeset');
 
   const { data: documents } = useQuery({
     queryKey: ['sourceDocuments'],
@@ -23,22 +23,30 @@ export const DocumentsPage: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-semibold mb-1">
-          <FileText className="w-3.5 h-3.5 text-blue-600" />
-          <span>Immutable Document Vault</span>
+    <div className="space-y-8 max-w-6xl mx-auto">
+      {/* Editorial Masthead */}
+      <div className="border-b border-[#E5E5E0] pb-5 space-y-2">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <div>
+            <span className="meta-caps text-[#777E89] block mb-1">
+              Archival Registry &bull; Cryptographic Provenance
+            </span>
+            <h1 className="font-serif text-3xl font-semibold text-[#171A21] tracking-tight">
+              Source Statutory Documents &amp; Checksums
+            </h1>
+          </div>
+          <span className="font-mono text-xs text-[#137C72] bg-[#EFF8F7] border border-[#B3DFDA] px-2.5 py-1 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>SHA-256 Verified Immutable</span>
+          </span>
         </div>
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-          Source Policy Documents & Cryptographic Hashes
-        </h1>
-        <p className="text-xs text-slate-500 mt-0.5">
-          These official files form the single authoritative source of truth. Integrity is verified via SHA-256 checksums.
+        <p className="font-serif text-sm text-[#777E89] max-w-3xl leading-relaxed">
+          The two official legal texts forming the exclusive and exhaustive Single Source of Truth.
+          Cryptographically hashed and ingested into SQLite without modification or loss.
         </p>
       </div>
 
-      {/* Document Cards */}
+      {/* Document Selection Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {documents?.map((doc) => {
           const isSelected = selectedDocId === doc.document_id;
@@ -48,69 +56,61 @@ export const DocumentsPage: React.FC = () => {
             <div
               key={doc.document_id}
               onClick={() => setSelectedDocId(doc.document_id)}
-              className={`p-5 rounded-xl border cursor-pointer transition-all space-y-3 ${
+              className={`p-5 bg-white border cursor-pointer transition-all space-y-3.5 shadow-subtle ${
                 isSelected
-                  ? 'bg-blue-50/50 border-blue-500 shadow-sm'
-                  : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
+                  ? 'border-[#171A21] ring-1 ring-[#171A21]'
+                  : 'border-[#E5E5E0] hover:border-[#171A21]'
               }`}
             >
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`p-2 rounded-lg ${
-                      isAmendment ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'
-                    }`}
-                  >
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded uppercase font-semibold ${
-                        isAmendment
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}
-                    >
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[10px] font-mono px-1.5 py-0.2 border uppercase font-semibold ${
+                      isAmendment
+                        ? 'bg-[#EFF8F7] text-[#137C72] border-[#B3DFDA]'
+                        : 'bg-[#F8F8F5] text-[#171A21] border-[#E5E5E0]'
+                    }`}>
                       {doc.document_type}
                     </span>
-                    <h3 className="text-sm font-bold text-slate-900 mt-0.5">
-                      {doc.title}
-                    </h3>
+                    <span className="meta-caps text-[#777E89]">
+                      {doc.filename}
+                    </span>
                   </div>
+                  <h3 className="font-serif text-base font-semibold text-[#171A21]">
+                    {doc.title}
+                  </h3>
                 </div>
-
-                {isSelected && (
-                  <span className="flex items-center gap-1 text-[11px] text-blue-700 font-semibold">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Viewing
-                  </span>
-                )}
+                <div className="p-2 bg-[#F8F8F5] border border-[#E5E5E0] text-[#171A21]">
+                  <FileText className="w-4 h-4" />
+                </div>
               </div>
 
-              <div className="text-xs text-slate-600 space-y-1.5 pt-1 border-t border-slate-100">
-                <p className="flex items-center justify-between">
-                  <span className="text-slate-400">Filename:</span>
-                  <span className="font-mono text-slate-700">{doc.filename}</span>
-                </p>
-                <p className="flex items-center justify-between">
-                  <span className="text-slate-400">Effective Date:</span>
-                  <span className="font-mono text-slate-700">{doc.effective_date}</span>
-                </p>
-                <p className="flex items-center justify-between">
-                  <span className="text-slate-400">Size & Clauses:</span>
-                  <span className="font-mono text-slate-700">
-                    {(doc.byte_size / 1024).toFixed(1)} KB &bull; {doc.clause_count} items
-                  </span>
-                </p>
+              {/* Metadata Rows */}
+              <div className="text-xs font-mono space-y-1.5 pt-2 border-t border-[#E5E5E0] text-[#252A32]">
+                <div className="flex items-center justify-between">
+                  <span className="text-[#777E89]">Effective Date:</span>
+                  <span className="font-medium">{doc.effective_date}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#777E89]">Ingested Provisions:</span>
+                  <span className="font-medium">{doc.clause_count} clauses</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#777E89]">File Size:</span>
+                  <span className="font-medium">{(doc.byte_size / 1024).toFixed(1)} KB</span>
+                </div>
               </div>
 
-              {/* SHA-256 Checksum Display */}
-              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <Hash className="w-3 h-3 text-slate-400" />
-                  <span>SHA-256 Cryptographic Checksum</span>
-                </span>
-                <p className="font-mono text-[10px] text-slate-700 break-all select-all">
+              {/* SHA-256 Checksum */}
+              <div className="p-2.5 bg-[#F8F8F5] border border-[#E5E5E0] space-y-1">
+                <div className="flex items-center justify-between text-[10px] font-mono text-[#777E89]">
+                  <span className="meta-caps">SHA-256 Hash</span>
+                  <span className="text-[#137C72] flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Verified
+                  </span>
+                </div>
+                <p className="font-mono text-[10px] text-[#252A32] truncate select-all">
                   {doc.sha256_hash}
                 </p>
               </div>
@@ -119,27 +119,65 @@ export const DocumentsPage: React.FC = () => {
         })}
       </div>
 
-      {/* Raw Verbatim Content Viewer */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-        <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+      {/* Document Reader Container */}
+      <div className="bg-white border border-[#E5E5E0] shadow-subtle overflow-hidden">
+        {/* Reader Header & Tab Switcher */}
+        <div className="p-4 border-b border-[#E5E5E0] bg-[#F8F8F5] flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Eye className="w-4 h-4 text-blue-600" />
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-800">
-              Verbatim Markdown Document Viewer: {docDetail?.title || 'Loading...'}
-            </h2>
+            <span className="meta-caps text-[#171A21]">
+              Reading: {docDetail?.title || 'Loading document...'}
+            </span>
           </div>
-          <span className="text-[10px] font-mono text-slate-400">Read-Only Immutable Source</span>
+
+          <div className="flex items-center gap-2">
+            <div className="inline-flex border border-[#E5E5E0] bg-white p-0.5 text-xs font-mono">
+              <button
+                type="button"
+                onClick={() => setViewMode('typeset')}
+                className={`px-2 py-0.5 transition-colors ${
+                  viewMode === 'typeset'
+                    ? 'bg-[#171A21] text-white font-medium'
+                    : 'text-[#777E89] hover:text-[#171A21]'
+                }`}
+              >
+                Typeset Gazette
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('raw')}
+                className={`px-2 py-0.5 transition-colors ${
+                  viewMode === 'raw'
+                    ? 'bg-[#171A21] text-white font-medium'
+                    : 'text-[#777E89] hover:text-[#171A21]'
+                }`}
+              >
+                Verbatim Source
+              </button>
+            </div>
+          </div>
         </div>
 
-        {detailLoading ? (
-          <div className="p-12 text-center text-xs text-slate-400">Loading document content...</div>
-        ) : (
-          <div className="p-6 max-h-[700px] overflow-y-auto bg-slate-50/50">
-            <pre className="font-mono text-xs text-slate-800 whitespace-pre-wrap leading-relaxed select-text">
+        {/* Reader Content */}
+        <div className="p-6 max-h-[640px] overflow-y-auto">
+          {detailLoading ? (
+            <div className="p-12 text-center text-xs text-[#777E89] font-mono animate-pulse">
+              Reading official document bytes from disk...
+            </div>
+          ) : viewMode === 'typeset' ? (
+            <div className="prose max-w-none font-serif text-[15px] leading-relaxed text-[#171A21] space-y-4">
+              <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] text-xs font-mono text-[#777E89] mb-6">
+                Official Gazette Notice &bull; Document ID: {selectedDocId} &bull; Effective: {docDetail?.effective_date}
+              </div>
+              <div className="whitespace-pre-line leading-relaxed font-serif text-[15px] text-[#252A32] selection:bg-[#171A21] selection:text-white">
+                {docDetail?.raw_content}
+              </div>
+            </div>
+          ) : (
+            <pre className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] text-xs font-mono text-[#252A32] overflow-x-auto whitespace-pre-wrap leading-relaxed select-all">
               {docDetail?.raw_content}
             </pre>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

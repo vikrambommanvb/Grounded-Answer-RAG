@@ -21,30 +21,36 @@ export const SupervisoryWarning: React.FC<SupervisoryWarningProps> = ({ warnings
         return (
           <div
             key={index}
-            className={`p-3.5 rounded-lg border text-xs flex items-start gap-3 shadow-xs ${
+            className={`p-3.5 border text-xs flex items-start gap-3 shadow-subtle ${
               isSupervisoryGate
-                ? 'bg-amber-50 border-amber-300 text-amber-950'
+                ? 'bg-[#FDF7EE] border-[#F4DCB7] text-[#171A21]'
                 : isTransitional
-                ? 'bg-blue-50 border-blue-200 text-blue-950'
-                : 'bg-slate-50 border-slate-200 text-slate-800'
+                ? 'bg-[#EFF2FC] border-[#C7D4F7] text-[#171A21]'
+                : 'bg-[#F8F8F5] border-[#E5E5E0] text-[#171A21]'
             }`}
           >
             {isSupervisoryGate ? (
-              <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <ShieldAlert className="w-4 h-4 text-[#B77A24] shrink-0 mt-0.5" />
             ) : isTransitional ? (
-              <Clock className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <Clock className="w-4 h-4 text-[#3458DB] shrink-0 mt-0.5" />
             ) : (
-              <AlertTriangle className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+              <AlertTriangle className="w-4 h-4 text-[#777E89] shrink-0 mt-0.5" />
             )}
             <div className="space-y-0.5 flex-1">
-              <span className="font-semibold uppercase tracking-wider text-[10px] block opacity-90">
+              <span className={`meta-caps block ${
+                isSupervisoryGate
+                  ? 'text-[#B77A24]'
+                  : isTransitional
+                  ? 'text-[#3458DB]'
+                  : 'text-[#777E89]'
+              }`}>
                 {isSupervisoryGate
                   ? 'Mandatory Supervisory Referral Gate (§2.3.2)'
                   : isTransitional
                   ? 'Transitional Rule Notice'
                   : 'Casework Advisory Warning'}
               </span>
-              <p className="leading-relaxed text-xs">{warn}</p>
+              <p className="leading-relaxed text-xs text-[#252A32]">{warn}</p>
             </div>
           </div>
         );

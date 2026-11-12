@@ -1,124 +1,74 @@
-# THE GROUNDED ANSWER — DESIGN SPECIFICATION
-**Version:** 1.0.0  
-**Design Persona:** Professional Evidence-Verification Casework Workspace  
-**Design Inspo:** ChatGPT (Conversational Flow) &times; Perplexity (Evidence Transparency) &times; Linear (Precision Navigation)  
-**UI Skills Integrated:** `anthropics/frontend-design` & `ibelick/baseline-ui` (Retrieved via `npx ui-skills`)  
-**Theme:** Light theme by default, high-density legal clarity, accessible, restrained aesthetics.
+# THE GROUNDED ANSWER — ANTI-AI-SLOP DESIGN SYSTEM & EDITORIAL SPECIFICATION
 
----
+## 1. Design Philosophy & Creative Direction
+The Grounded Answer is an evidence-grounded policy intelligence workstation for Calder County Household Support Program (HSP) caseworkers. 
 
-## 1. Visual Identity & Design Philosophy
-"The Grounded Answer" is a mission-critical policy intelligence platform for Calder County Household Support Program caseworkers.
-- **Tone:** Authoritative, reliable, calm, unambiguous.
-- **Core Principle:** Evidence transparency. The user must always see *why* an answer was given, *which clauses* back it up, and *how* effective dates alter the outcome.
-- **Baseline UI Quality:** Clean 1px borders, subtle soft shadows, `text-balance` on headings, `text-pretty` on prose, and `tabular-nums` on all benefit amounts and statutory figures.
-- **Visual Restraint:** Strict ban on generic purple AI gradients, floating decorative orbs, or arbitrary glow effects. Deep slate typography on crisp white/off-white surfaces.
+Unlike generic "AI SaaS" templates characterised by saturated purple gradients, glowing neon orbs, meaningless particles, and bubbly card grids, this application is styled after **Swiss International Typographic Design**, **Linear interface precision**, and **editorial legal research workstations** (such as high-end judicial databases and financial intelligence terminals).
+
+Every element earns its place. Decoration without informative purpose is rejected.
 
 ---
 
 ## 2. Color System
+A strictly restrained 10-color semantic palette communicates meaning rather than visual noise:
 
-### Primary & Neutral Palette (Light Mode Default)
-- **Background Root:** `#F8FAFC` (Slate-50) — Off-white canvas that reduces eye strain during 8-hour casework shifts.
-- **Surface / Cards:** `#FFFFFF` (Pure White) — Crisp card backgrounds with subtle borders (`border-slate-200`).
-- **Surface Raised / Inputs:** `#F1F5F9` (Slate-100) — Input fields, date picker containers, and secondary badges.
-- **Border Subtle:** `#E2E8F0` (Slate-200) — 1px clean dividers and card borders.
-- **Border Hover / Focus:** `#94A3B8` (Slate-400) / `#3B82F6` (Blue-500) with `focus-visible:ring-2`.
-
-### Typography Grayscale
-- **Headings / Primary Text:** `#0F172A` (Slate-900) — Deep slate for optimal readability and legal weight.
-- **Body Text:** `#334155` (Slate-700) — High contrast text meeting WCAG AAA standard (ratio > 7:1).
-- **Secondary / Captions:** `#64748B` (Slate-500) — Metadata, clause path hierarchy, and helper text.
-- **Muted / Placeholders:** `#94A3B8` (Slate-400).
-
-### Restrained Semantic Accents
-- **Primary Brand / Action:** `#2563EB` (Blue-600) — Clean, federal/executive blue for active buttons, tabs, and focus rings.
-- **Primary Subtle / Pills:** `#EFF6FF` (Blue-50) with `#BFDBFE` (Blue-200) border.
-- **Amended Post-March Rate:** `#059669` (Emerald-600) with `#ECFDF5` (Emerald-50) background and `#A7F3D0` (Emerald-200) border.
-- **Supervisory Gate / Notice:** `#D97706` (Amber-600) with `#FFFBEB` (Amber-50) background and `#FDE68A` (Amber-200) border.
-- **Policy Refusal / Inconsistency:** `#DC2626` (Red-600) with `#FEF2F2` (Red-50) background and `#FECACA` (Red-200) border.
-- **Temporal / Spanning Claim:** `#7C3AED` (Purple-600) with `#FAF5FF` (Purple-50) background.
+| Token | Hex Value | Semantic Function & Application |
+| :--- | :--- | :--- |
+| **Warm Off-White** | `#F8F8F5` | Primary canvas background. Warm, tactile, non-glaring for extended casework reading. |
+| **Pure White** | `#FFFFFF` | Layered surfaces, active document sheets, and workspace panels. |
+| **Ink** | `#171A21` | Primary typographic color, headings, active iconography, strong visual anchors. |
+| **Deep Charcoal** | `#252A32` | Secondary body text, statutory prose, table data. |
+| **Muted Grey** | `#777E89` | Tertiary metadata, timestamps, input placeholders, breadcrumbs, borders. |
+| **Fine Borders** | `#E5E5E0` | 1px structural gridlines, column dividers, card edges. No heavy drop-shadows. |
+| **Accent Cobalt** | `#3458DB` | Focused actions, primary buttons, active navigation, clause link hover. |
+| **Evidence Teal** | `#137C72` | Verified statutory grounding, positive citation badges, checksum verification. |
+| **Warning Ochre** | `#B77A24` | Mandatory supervisory referral gates (§2.3.2), transitional notices (Paras 5.1–5.3). |
+| **Refusal Red** | `#B94040` | Doctrine of Responsible Refusal (apparent gap, internal conflict, missing date). |
 
 ---
 
-## 3. Typography & Hierarchy
+## 3. Typography Hierarchy
+Two high-caliber typefaces establish clear visual distinction between interface chrome and legal prose:
 
-### Font Stacks
-- **UI & Prose:** `Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-- **Statutory Clauses & Figures:** `ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace`
-
-### Typography Rules (from UI Skills)
-- Headings use `text-balance` to avoid typographic orphans.
-- Paragraphs use `text-pretty` for optical rag alignment.
-- Monetary rates (`$120`, `$175`, `$4,000`) and timelines (`10`, `14`, `30` days) use `tabular-nums` for alignment in tables and cards.
-- Line lengths are constrained to `<= 75ch` for readability.
-
----
-
-## 4. Layout Dimensions & Structure
-
-### Application Shell
-- **Navbar:** Height: `56px` (`3.5rem`) — Fixed top, border-bottom `1px solid #E2E8F0`, bg `#FFFFFF`.
-- **Sidebar:** Width: `256px` (`16rem`) — Left fixed column, border-right `1px solid #E2E8F0`, bg `#F8FAFC`.
-- **Main Workspace:** Fluid remaining width, padding `24px` (`1.5rem`), scrollable vertically, viewport height `h-dvh`.
-
-### 3-Panel Assistant Workspace (Desktop)
-1. **Left Panel (Sidebar):** Navigation across the 8 application modules (256px).
-2. **Center Panel (Conversation):** Chat stream, natural language query bar, temporal context bar, and grounded answer cards (min-width `500px`, max-width `820px`, flex-1).
-3. **Right Panel (Evidence Envelope):** Real-time retrieved evidence, clause ranking scores, and BM25 diagnostics (`380px` fixed, or slide-over drawer).
+* **Interface Chrome & Data:** `Inter` (sans-serif)
+  * Display Numbers & IDs: Monospace numerals with tabular figures (`tnum`).
+  * Micro Metadata: `font-size: 10px`, `font-weight: 600`, `letter-spacing: +0.06em`, uppercase.
+  * Form Controls & Badges: `12px` / `13px`, medium weight (`500`).
+* **Statutory Content & Major Section Titles:** `Newsreader` (optical size `opsz: 6..72`)
+  * Editorial Section Headings: `font-serif`, `tracking: -0.025em`, leading `1.15`.
+  * Verbatim Statutory Policy Text: `font-serif`, `font-size: 15px`, `line-height: 1.7`, high legibility.
+* **Code, Hashes, & Statutory Identifiers:** `JetBrains Mono`
+  * Clause IDs (`§6.4.1(a)`), SHA-256 hashes, execution latencies (`1.7ms`).
 
 ---
 
-## 5. Component Design Specifications
-
-### 5.1 Citation Badges (Perplexity-Style)
-- **Shape:** Rounded pill (`rounded-md`), border `1px solid`, padding `2px 8px`.
-- **Interactive State:** Hover elevates background, changes cursor to pointer, subtle scale transition `transform 150ms ease-out`.
-- **Amended Indicator:** Displays a small emerald spark icon and `Amended` badge if modified by Amendment No. 2026-01.
-- **Click Behavior:** Triggers the slide-over Clause Drawer with verbatim text and amendment diff.
-
-### 5.2 Slide-Over Clause Drawer
-- **Position:** Right-hand side overlay with smooth slide-in (`duration-200 ease-out`).
-- **Header:** Clause identifier (`§6.4.1(a)`), section title, Part number, close button with `aria-label="Close Inspector"`.
-- **Body:**
-  - Effective overlay alert (Action, Effective date, Transitional rule).
-  - Verbatim text block formatted in monospace font with high contrast.
-  - Baseline text with strike-through if amended.
-  - Clickable cross-reference badges.
-
-### 5.3 Temporal Context Bar
-- **Position:** Directly integrated with the Casework Assistant query input.
-- **Controls:** 4 accessible HTML5 date pickers:
-  - Determination Date
-  - Change Occurrence Date
-  - Claim Start Date
-  - Claim End Date
-- **Preset Buttons:** Quick 1-click casework chips:
-  - "Pre-Amendment (Feb 2026)"
-  - "Post-Amendment (Mar 2026)"
-  - "Transitional Split (Para 5.1 vs 5.2)"
-  - "Spanning Claim (Para 5.3)"
-  - "Clear Dates"
-
-### 5.4 Structured Refusal Card
-- **Border:** `2px solid #DC2626` (Red) or `#D97706` (Amber).
-- **Background:** Crisp `#FEF2F2` or `#FFFBEB`.
-- **4-Part Structure:**
-  1. *Refusal Category Pill:* e.g., `APPARENT_GAP` or `INTERNAL_CONFLICT`.
-  2. *Formal Statement:* Plain, objective reason why the query cannot be answered from policy.
-  3. *Missing Information Checklist:* Bulleted list of facts required to proceed.
-  4. *Actionable Caseworker Next Step:* Clear instruction on who to consult (e.g., County Policy Leadership).
-
-### 5.5 Supervisory Referral Warning Banner
-- **Border:** `1px solid #FCD34D`.
-- **Background:** Soft warm amber `#FFFBEB`.
-- **Icon:** Alert Shield (`ShieldAlert`).
-- **Trigger:** Any youth applicant (16-17) under §2.3.2 or unresolved transitional split.
+## 4. Layout Architecture & Dimensions
+* **Global Shell:** Fixed viewport height (`100vh`), non-scrolling outer body, dual-pane layout.
+* **Top Navigation Bar:** Height `52px` (subtle and compact), `#FFFFFF` with `1px` border `#E5E5E0` and `backdrop-filter: blur(16px)`.
+* **Sidebar:** Fixed width `240px` (desktop), collapsible to icon rail on compact screens. Clear architectural groupings.
+* **Casework Assistant Workspace:**
+  * 3-column workstation layout:
+    1. **Inquiry History Column** (`260px`): List of recent queries, status tags, and presets.
+    2. **Answer Workspace** (Center, fluid flex-1): Prompt input, temporal date context, answers, warnings, refusal cards.
+    3. **Evidence Inspector** (`340px`): Ranked clause snippets, BM25/vector scores, instant drawer triggers.
+* **Policy Explorer:** Document reading pane with 12-part statutory index, search bar, side-by-side diff viewer, and 3D Statutory Dependency Graph.
 
 ---
 
-## 6. Accessibility & Interaction (WCAG 2.1 AA)
-- **Contrast:** All text satisfies minimum contrast ratio of 4.5:1 against its background.
-- **Keyboard Navigation:** All interactive elements (citations, tree nodes, date inputs, drawer close buttons) are fully keyboard-navigable with clear `:focus-visible` rings (`ring-2 ring-blue-500 ring-offset-2`).
-- **Semantic Tags:** Semantic tags `<header>`, `<aside>`, `<main>`, `<nav>`, `<button>`, `<input>` used throughout.
-- **ARIA Live Regions:** Dynamic assistant responses, loading spinners, and benchmark progress announced to screen readers.
+## 5. Apple Design & Motion Principles
+Following Apple's *Designing Fluid Interfaces* principles:
+* **Response — Zero Perceived Latency:** Buttons and pills respond on `pointer-down` with `active:scale-[0.98]`.
+* **Critically Damped Springs:** Animations use `framer-motion` springs with `damping: 1.0, stiffness: 200` (critically damped, zero oscillation or toy-like bounce).
+* **Spatial Symmetry:** Slide-over drawers enter from the right and exit back to the right along the identical curve.
+* **Translucency with Purpose:** Subdued `backdrop-filter: blur(16px)` on floating navigation chrome and modal scrims.
+* **Reduced Motion:** Fully honors `@media (prefers-reduced-motion: reduce)` by falling back to crisp opacity cross-fades.
+
+---
+
+## 6. Three.js Statutory Dependency Visualization
+Located inside the **Policy Explorer**, this 3D visualization models real statutory cross-references:
+* 148 clause nodes positioned in a 3D cylindrical manifold clustered by Policy Part.
+* Fine hairline connectors representing actual `cross_references` between clauses.
+* Color-coded states: Standard baseline clauses (`#252A32`), amended clauses under No. 2026-01 (`#3458DB` cobalt / `#B77A24` ochre), active selected clause (`#137C72` teal).
+* Direct click interaction to inspect clause text in the slide-over drawer.
+* Accessible 2D list fallback toggle.

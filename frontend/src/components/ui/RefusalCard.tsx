@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertOctagon, HelpCircle, ArrowRight, ShieldAlert, BookOpen } from 'lucide-react';
+import { AlertOctagon, ArrowRight, BookOpen } from 'lucide-react';
 import { RefusalDetails } from '../../types';
 
 interface RefusalCardProps {
@@ -12,36 +12,40 @@ export const RefusalCard: React.FC<RefusalCardProps> = ({ refusal, onSelectClaus
     switch (category) {
       case 'INTERNAL_CONFLICT':
         return {
-          border: 'border-red-300',
-          bg: 'bg-red-50/80',
-          badge: 'bg-red-100 text-red-800 border-red-200',
-          iconColor: 'text-red-600',
+          border: 'border-[#F6C1C1]',
+          bg: 'bg-[#FDF2F2]',
+          badge: 'bg-white text-[#B94040] border-[#F6C1C1]',
+          iconColor: 'text-[#B94040]',
           title: 'Policy Contradiction Detected',
+          label: 'Internal Conflict',
         };
       case 'APPARENT_GAP':
         return {
-          border: 'border-amber-300',
-          bg: 'bg-amber-50/80',
-          badge: 'bg-amber-100 text-amber-800 border-amber-200',
-          iconColor: 'text-amber-600',
+          border: 'border-[#F4DCB7]',
+          bg: 'bg-[#FDF7EE]',
+          badge: 'bg-white text-[#B77A24] border-[#F4DCB7]',
+          iconColor: 'text-[#B77A24]',
           title: 'Apparent Statutory Gap Detected',
+          label: 'Drafting Omission',
         };
       case 'MISSING_TEMPORAL_DATA':
         return {
-          border: 'border-blue-300',
-          bg: 'bg-blue-50/80',
-          badge: 'bg-blue-100 text-blue-800 border-blue-200',
-          iconColor: 'text-blue-600',
+          border: 'border-[#C7D4F7]',
+          bg: 'bg-[#EFF2FC]',
+          badge: 'bg-white text-[#3458DB] border-[#C7D4F7]',
+          iconColor: 'text-[#3458DB]',
           title: 'Missing Required Temporal Context',
+          label: 'Temporal Ambiguity',
         };
       case 'OUT_OF_SCOPE':
       default:
         return {
-          border: 'border-slate-300',
-          bg: 'bg-slate-50',
-          badge: 'bg-slate-100 text-slate-800 border-slate-200',
-          iconColor: 'text-slate-600',
+          border: 'border-[#E5E5E0]',
+          bg: 'bg-[#F8F8F5]',
+          badge: 'bg-white text-[#777E89] border-[#E5E5E0]',
+          iconColor: 'text-[#777E89]',
           title: 'Query Out of Scope / Insufficient Facts',
+          label: 'Scope Limitation',
         };
     }
   };
@@ -49,81 +53,86 @@ export const RefusalCard: React.FC<RefusalCardProps> = ({ refusal, onSelectClaus
   const theme = getCategoryTheme(refusal.category);
 
   return (
-    <div className={`rounded-xl border ${theme.border} ${theme.bg} p-5 space-y-4 shadow-xs animate-in fade-in duration-200`}>
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-white border border-slate-200 shrink-0 shadow-xs">
-            <AlertOctagon className={`w-5 h-5 ${theme.iconColor}`} />
+    <div className={`border ${theme.border} ${theme.bg} p-5 space-y-4 shadow-subtle`}>
+      {/* 1. Header & Category */}
+      <div className="flex items-start justify-between gap-3 border-b border-[#E5E5E0]/60 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 bg-white border border-[#E5E5E0] shrink-0">
+            <AlertOctagon className={`w-4 h-4 ${theme.iconColor}`} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className={`text-[11px] font-mono px-2 py-0.5 rounded border uppercase font-semibold ${theme.badge}`}>
+              <span className={`text-[10px] font-mono px-1.5 py-0.2 border uppercase font-semibold ${theme.badge}`}>
                 {refusal.category}
               </span>
-              <span className="text-xs text-slate-500">Strict Refusal Protocol</span>
+              <span className="meta-caps text-[#777E89]">
+                Strict Refusal Protocol
+              </span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-900 mt-0.5">
+            <h3 className="font-serif text-base font-semibold text-[#171A21] mt-0.5">
               {theme.title}
             </h3>
           </div>
         </div>
       </div>
 
-      {/* Formal Reason */}
-      <div className="p-3.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 leading-relaxed font-sans shadow-xs">
-        {refusal.reason}
+      {/* 2. Structured Reason / Explanation */}
+      <div className="space-y-1.5">
+        <span className="meta-caps text-[#777E89] block">
+          Statutory Justification for Refusal
+        </span>
+        <div className="p-3.5 bg-white border border-[#E5E5E0] font-serif text-sm leading-relaxed text-[#171A21]">
+          {refusal.reason}
+        </div>
       </div>
 
-      {/* Missing Information Checklist */}
+      {/* 3. Missing Information (if present) */}
       {refusal.missing_information && refusal.missing_information.length > 0 && (
         <div className="space-y-1.5">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-            <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-            <span>Missing Information Required to Answer</span>
-          </h4>
-          <ul className="space-y-1 pl-1">
+          <span className="meta-caps text-[#777E89] block">
+            Missing Information Required to Answer
+          </span>
+          <div className="p-3 bg-white border border-[#E5E5E0] space-y-1">
             {refusal.missing_information.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-xs text-slate-700">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+              <div key={idx} className="flex items-start gap-2 text-xs text-[#252A32]">
+                <span className="text-[#3458DB] font-mono font-bold">&bull;</span>
                 <span>{item}</span>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
-      {/* Partial Relevant Clauses */}
+      {/* 4. Partial Relevant Clauses (if present) */}
       {refusal.partial_relevant_clauses && refusal.partial_relevant_clauses.length > 0 && (
-        <div className="space-y-2 pt-2 border-t border-slate-200">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5 text-blue-600" />
-            <span>Partial Relevant Policy Provisions</span>
-          </h4>
+        <div className="space-y-1.5">
+          <span className="meta-caps text-[#777E89] block">
+            Partial Relevant Policy Provisions
+          </span>
           <div className="flex flex-wrap gap-2">
             {refusal.partial_relevant_clauses.map((clauseId) => (
               <button
                 key={clauseId}
                 type="button"
                 onClick={() => onSelectClause && onSelectClause(clauseId)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white hover:bg-slate-100 border border-slate-200 text-xs font-mono text-blue-700 transition-colors shadow-xs"
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono bg-white hover:bg-[#F8F8F5] border border-[#E5E5E0] hover:border-[#3458DB] text-[#171A21] transition-all"
               >
+                <BookOpen className="w-3 h-3 opacity-60" />
                 <span>{clauseId}</span>
-                <ArrowRight className="w-2.5 h-2.5 opacity-60" />
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Actionable Next Step for Caseworker */}
+      {/* 5. Recommended Next Step */}
       {refusal.recommended_next_step && (
-        <div className="p-3.5 rounded-lg bg-blue-50/70 border border-blue-200 space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-900 uppercase tracking-wider">
-            <ShieldAlert className="w-3.5 h-3.5 text-blue-700" />
+        <div className="p-3 bg-white border border-[#E5E5E0] text-xs text-[#171A21] space-y-1">
+          <span className="meta-caps text-[#137C72] flex items-center gap-1.5">
+            <ArrowRight className="w-3 h-3" />
             <span>Actionable Guidance for Caseworker</span>
-          </div>
-          <p className="text-xs text-blue-950 leading-relaxed">
+          </span>
+          <p className="leading-relaxed font-sans text-xs text-[#252A32]">
             {refusal.recommended_next_step}
           </p>
         </div>

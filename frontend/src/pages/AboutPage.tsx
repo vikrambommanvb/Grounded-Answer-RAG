@@ -1,137 +1,184 @@
 import React from 'react';
 import {
-  Info,
   ShieldCheck,
   AlertOctagon,
-  HelpCircle,
   History,
+  Scale,
 } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
   return (
-    <div className="space-y-6 max-w-4xl">
-      {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-semibold mb-1">
-          <Info className="w-3.5 h-3.5 text-blue-600" />
-          <span>Policy Doctrine & Methodology</span>
+    <div className="space-y-8 max-w-5xl mx-auto">
+      {/* Editorial Masthead */}
+      <div className="border-b border-[#E5E5E0] pb-5 space-y-2">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <div>
+            <span className="meta-caps text-[#777E89] block mb-1">
+              Casework Doctrine &bull; Policy Jurisprudence
+            </span>
+            <h1 className="font-serif text-3xl font-semibold text-[#171A21] tracking-tight">
+              About The Grounded Answer
+            </h1>
+          </div>
+          <span className="font-mono text-xs text-[#137C72] bg-[#EFF8F7] border border-[#B3DFDA] px-2.5 py-1">
+            System Methodology &amp; Doctrine
+          </span>
         </div>
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-          About The Grounded Answer
-        </h1>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Design doctrine, statutory gap handling, amendment architecture, and refusal standards.
+        <p className="font-serif text-sm text-[#777E89] max-w-3xl leading-relaxed">
+          The Grounded Answer is an evidence-grounded policy intelligence assistant built for Calder County Household Support Program caseworkers.
+          Here we articulate the core doctrines governing statutory fidelity, responsible refusal, and temporal resolution.
         </p>
       </div>
 
-      {/* Core Doctrine */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-          <ShieldCheck className="w-5 h-5 text-blue-600" />
-          <h2 className="text-sm font-bold text-slate-900">
-            1. The Single Source of Truth Doctrine
-          </h2>
-        </div>
-        <p className="text-xs text-slate-700 leading-relaxed">
-          The Grounded Answer is engineered exclusively for Calder County Household Support Program caseworkers.
-          Unlike conversational AI models that guess or extrapolate from generic social welfare concepts, this system
-          treats the consolidated Policy Manual and Amendment No. 2026-01 as the sole and exhaustive authority.
-          If a rule or figure is not written in the official text, the system is architected to refuse to provide an answer.
-        </p>
-      </div>
-
-      {/* Doctrine of Refusal */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-          <AlertOctagon className="w-5 h-5 text-red-600" />
-          <h2 className="text-sm font-bold text-slate-900">
-            2. The Doctrine of Responsible Refusal
-          </h2>
-        </div>
-        <p className="text-xs text-slate-700 leading-relaxed">
-          In public assistance administration, an incorrect benefit figure or fabricated deadline directly harms applicants
-          and creates catastrophic audit liability. The Grounded Answer implements an automated Refusal Engine that actively
-          screens every query before generating text. Queries are refused under five strict categories:
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
-          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-            <span className="font-mono font-bold text-red-700">APPARENT_GAP</span>
-            <p className="text-slate-600">Surfaces drafting omissions where the manual points to a section that does not contain the rule.</p>
+      <div className="space-y-6">
+        {/* Doctrine 1: Single Source of Truth */}
+        <div className="bg-white border border-[#E5E5E0] p-6 space-y-3.5 shadow-subtle">
+          <div className="flex items-center gap-2 border-b border-[#E5E5E0] pb-3">
+            <ShieldCheck className="w-5 h-5 text-[#137C72]" />
+            <h2 className="font-serif text-lg font-semibold text-[#171A21]">
+              1. The Single Source of Truth Doctrine
+            </h2>
           </div>
-          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-            <span className="font-mono font-bold text-red-700">INTERNAL_CONFLICT</span>
-            <p className="text-slate-600">Surfaces irreconcilable statutory rules within the manual (e.g. §4.3.2 vs §9.1.4).</p>
-          </div>
-          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-            <span className="font-mono font-bold text-blue-700">MISSING_TEMPORAL_DATA</span>
-            <p className="text-slate-600">Refuses rate queries where dates are missing, preventing the assistant from assuming today&apos;s date.</p>
-          </div>
-          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-            <span className="font-mono font-bold text-slate-700">OUT_OF_SCOPE</span>
-            <p className="text-slate-600">Refuses commercial grants, immigration, or unrelated federal programs.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Challenge Traps Analysis */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-          <HelpCircle className="w-5 h-5 text-amber-600" />
-          <h2 className="text-sm font-bold text-slate-900">
-            3. Specific Challenge Traps Surfaced & Handled
-          </h2>
-        </div>
-
-        <div className="space-y-3 text-xs text-slate-700 leading-relaxed">
-          <div className="p-4 rounded-lg bg-amber-50/60 border border-amber-200 space-y-1.5">
-            <h3 className="font-bold text-amber-950">
-              The Full-Time Student Gap Trap (§7.1.3 &rarr; §5.4)
-            </h3>
+          <div className="font-serif text-sm text-[#252A32] leading-relaxed space-y-2">
             <p>
-              In §7.1.3, the manual states: <em>&ldquo;except in the case of full-time students (see §5.4)&rdquo;</em>. However,
-              upon inspecting §5.4, that section exclusively governs Care Allowances. No student calculation rules exist anywhere
-              in the Policy Manual. Generic LLMs fabricate formulas; The Grounded Answer refuses with <code>APPARENT_GAP</code> and
-              instructs the caseworker to refer the case to County Policy Leadership.
+              In public assistance administration, generic LLM extrapolation or guessing leads directly to erroneous benefit awards and audit disallowances.
+              The Grounded Answer treats the official Calder County Household Support Program Policy Manual (31 December 2025) and Amendment No. 2026-01 (1 March 2026) as the <strong>exclusive, exhaustive authority</strong>.
             </p>
-          </div>
-
-          <div className="p-4 rounded-lg bg-red-50/60 border border-red-200 space-y-1.5">
-            <h3 className="font-bold text-red-950">
-              The Pre-Amendment Reporting Deadline Inconsistency (§4.3.2 vs §9.1.4)
-            </h3>
-            <p>
-              In the pre-amendment consolidated manual, §4.3.2 mandates that recipients report changes within 10 calendar days.
-              However, §9.1.4 states that no overpayment shall be established if reported within the <em>&ldquo;30 calendar days required under §4.3&rdquo;</em>.
-              This direct statutory contradiction is refused with <code>INTERNAL_CONFLICT</code> for pre-March 2026 events.
+            <p className="text-[#777E89] text-xs font-sans">
+              If an operational rule, disregard figure, or deadline is not codified in verbatim statutory text, the engine refuses to answer rather than speculating.
             </p>
           </div>
         </div>
-      </div>
 
-      {/* Effective-Dated Overlay Architecture */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-          <History className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-sm font-bold text-slate-900">
-            4. Effective-Dated Amendment Architecture
-          </h2>
+        {/* Doctrine 2: The Doctrine of Responsible Refusal */}
+        <div className="bg-white border border-[#E5E5E0] p-6 space-y-4 shadow-subtle">
+          <div className="flex items-center gap-2 border-b border-[#E5E5E0] pb-3">
+            <AlertOctagon className="w-5 h-5 text-[#B94040]" />
+            <h2 className="font-serif text-lg font-semibold text-[#171A21]">
+              2. The Doctrine of Responsible Refusal
+            </h2>
+          </div>
+          <p className="font-serif text-sm text-[#252A32] leading-relaxed">
+            A refusal is not a system failure. In legal and regulatory casework, a calibrated refusal is the highest standard of correctness when statutory text is insufficient, ambiguous, or contradictory.
+            The engine implements five structured refusal categories:
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="p-4 bg-[#FDF2F2] border border-[#F6C1C1] space-y-1">
+              <span className="font-mono font-bold text-[#B94040]">APPARENT_GAP</span>
+              <p className="text-[#252A32] leading-relaxed">
+                Triggered when the manual contains a drafting omission (e.g. cross-referencing a section that does not exist or does not provide the referenced rule).
+              </p>
+            </div>
+
+            <div className="p-4 bg-[#FDF2F2] border border-[#F6C1C1] space-y-1">
+              <span className="font-mono font-bold text-[#B94040]">INTERNAL_CONFLICT</span>
+              <p className="text-[#252A32] leading-relaxed">
+                Triggered when two sections of the governing text establish contradictory requirements that cannot be harmonized without administrative discretion.
+              </p>
+            </div>
+
+            <div className="p-4 bg-[#EFF2FC] border border-[#C7D4F7] space-y-1">
+              <span className="font-mono font-bold text-[#3458DB]">MISSING_TEMPORAL_DATA</span>
+              <p className="text-[#252A32] leading-relaxed">
+                Triggered when a rate or deadline query lacks determination or occurrence dates, preventing the assistant from assuming today&apos;s date.
+              </p>
+            </div>
+
+            <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] space-y-1">
+              <span className="font-mono font-bold text-[#171A21]">OUT_OF_SCOPE</span>
+              <p className="text-[#252A32] leading-relaxed">
+                Triggered when an inquiry concerns commercial grants, foreign programs, or non-welfare matters outside Calder County DSS authority.
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="text-xs text-slate-700 leading-relaxed">
-          Amendment No. 2026-01 is implemented as an effective-dated overlay, never as a destructive replacement for the original text.
-          Transitional provisions are strictly enforced:
-        </p>
-        <ul className="text-xs text-slate-700 space-y-2 list-disc pl-5">
-          <li>
-            <strong>Paragraph 5.1:</strong> Earnings disregard ($175), income thresholds, and sanction rates (15%) apply to determinations made on or after 1 March 2026, including claims for prior periods.
-          </li>
-          <li>
-            <strong>Paragraph 5.2:</strong> 14-day reporting period applies only to changes occurring on or after 1 March 2026. Pre-March changes retain the earlier reporting rule regardless of determination date.
-          </li>
-          <li>
-            <strong>Paragraph 5.3:</strong> Claims spanning 1 March 2026 are apportioned on a daily basis by reference to days under §7.4.3.
-          </li>
-        </ul>
+
+        {/* Doctrine 3: Challenge Traps Jurisprudence */}
+        <div className="bg-white border border-[#E5E5E0] p-6 space-y-4 shadow-subtle">
+          <div className="flex items-center gap-2 border-b border-[#E5E5E0] pb-3">
+            <Scale className="w-5 h-5 text-[#B77A24]" />
+            <h2 className="font-serif text-lg font-semibold text-[#171A21]">
+              3. Challenge Traps Resolution
+            </h2>
+          </div>
+
+          <div className="space-y-4 text-xs text-[#252A32]">
+            {/* Trap 1 */}
+            <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-mono font-semibold text-[#B94040]">
+                  Trap 1: Full-Time Student Gap (§7.1.3 &rarr; §5.4)
+                </span>
+                <span className="meta-caps text-[#B94040] bg-[#FDF2F2] border border-[#F6C1C1] px-1.5 py-0.2">
+                  Apparent Gap
+                </span>
+              </div>
+              <p className="text-[#777E89] leading-relaxed">
+                Section 7.1.3 states: <em>&quot;except in the case of full-time students (see §5.4)&quot;</em>. However, Section 5.4 exclusively governs Care Allowances and contains zero rules for students. A generic LLM hallucinates an answer; The Grounded Answer executes a deterministic refusal instructing referral to Policy Leadership.
+              </p>
+            </div>
+
+            {/* Trap 2 */}
+            <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-mono font-semibold text-[#B94040]">
+                  Trap 2: Pre-Amendment Reporting Contradiction (§4.3.2 vs §9.1.4)
+                </span>
+                <span className="meta-caps text-[#B94040] bg-[#FDF2F2] border border-[#F6C1C1] px-1.5 py-0.2">
+                  Internal Conflict
+                </span>
+              </div>
+              <p className="text-[#777E89] leading-relaxed">
+                Prior to Amendment No. 2026-01, §4.3.2 required change reporting within 10 days, while §9.1.4 created a 30-day safe harbor. For pre-March 2026 changes, the engine refuses with INTERNAL_CONFLICT and alerts the caseworker to consult supervisory leadership.
+              </p>
+            </div>
+
+            {/* Trap 3 */}
+            <div className="p-4 bg-[#F8F8F5] border border-[#E5E5E0] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-mono font-semibold text-[#B77A24]">
+                  Trap 3: Under-18 Supervisory Referral Gate (§2.3.1 &amp; §2.3.2)
+                </span>
+                <span className="meta-caps text-[#B77A24] bg-[#FDF7EE] border border-[#F4DCB7] px-1.5 py-0.2">
+                  Supervisory Warning Gate
+                </span>
+              </div>
+              <p className="text-[#777E89] leading-relaxed">
+                An independent 16-year-old can qualify under §2.3.1, but §2.3.2 mandates immediate supervisory review. The system answers affirmatively while generating a prominent amber supervisory referral warning.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Doctrine 4: Effective-Dated Temporal Architecture */}
+        <div className="bg-white border border-[#E5E5E0] p-6 space-y-3.5 shadow-subtle">
+          <div className="flex items-center gap-2 border-b border-[#E5E5E0] pb-3">
+            <History className="w-5 h-5 text-[#3458DB]" />
+            <h2 className="font-serif text-lg font-semibold text-[#171A21]">
+              4. Effective-Dated Temporal Architecture
+            </h2>
+          </div>
+          <div className="font-serif text-sm text-[#252A32] leading-relaxed space-y-2">
+            <p>
+              Amendment No. 2026-01 is implemented as an effective-dated overlay. Historical text is never erased, ensuring retroactive audits and historical appeals can be adjudicated with 100% legal fidelity.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-mono font-normal">
+              <div className="p-3 bg-[#F8F8F5] border border-[#E5E5E0]">
+                <strong className="text-[#171A21] block mb-1">Para 5.1: Rates</strong>
+                Determination date &ge; 1 Mar 2026 gets $175 disregard.
+              </div>
+              <div className="p-3 bg-[#F8F8F5] border border-[#E5E5E0]">
+                <strong className="text-[#171A21] block mb-1">Para 5.2: Reporting</strong>
+                Occurrence date &ge; 1 Mar 2026 gets 14-day reporting window.
+              </div>
+              <div className="p-3 bg-[#F8F8F5] border border-[#E5E5E0]">
+                <strong className="text-[#171A21] block mb-1">Para 5.3: Spanning</strong>
+                §7.4.3 Daily rate apportionment for periods crossing 1 Mar 2026.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

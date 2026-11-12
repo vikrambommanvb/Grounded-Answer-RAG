@@ -3,8 +3,75 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+    --bg-warm: #F8F8F5;
+    --ink: #171A21;
+    --charcoal: #252A32;
+    --muted: #777E89;
+    --border-fine: #E5E5E0;
+    --accent-cobalt: #3458DB;
+    --evidence-teal: #137C72;
+    --warning-ochre: #B77A24;
+    --refusal-red: #B94040;
+  }
+
   body {
-    @apply antialiased text-slate-800 bg-slate-50 min-h-screen;
+    @apply antialiased text-[#171A21] bg-[#F8F8F5] min-h-screen font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Optical Sizing & Editorial Typography */
+  h1, h2, h3, .font-serif {
+    font-optical-sizing: auto;
+  }
+
+  /* Apple Design: Responsive pointer interactions */
+  button, a {
+    touch-action: manipulation;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #E5E5E0;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #777E89;
   }
 }
+
+@layer utilities {
+  .border-hairline {
+    border-width: 1px;
+    border-color: #E5E5E0;
+  }
+
+  .editorial-serif {
+    font-family: 'Newsreader', Georgia, serif;
+    letter-spacing: -0.02em;
+  }
+
+  .meta-caps {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .font-statutory {
+    font-family: 'Newsreader', Georgia, serif;
+    line-height: 1.7;
+    font-size: 0.9375rem;
+  }
+}
+
 
