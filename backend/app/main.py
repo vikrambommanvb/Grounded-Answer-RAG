@@ -56,7 +56,7 @@ app.include_router(documents.router, prefix="/api")
 app.include_router(evaluation.router, prefix="/api")
 app.include_router(system.router, prefix="/api")
 
-# Serve built frontend static files if present
+# Serve built frontend static files if present, or return API status
 import os
 from fastapi import HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -79,3 +79,16 @@ if os.path.exists(frontend_dist) and os.path.exists(os.path.join(frontend_dist, 
         if os.path.exists(target) and os.path.isfile(target):
             return FileResponse(target)
         raise HTTPException(status_code=404, detail="Not Found")
+else:
+    @app.get("/")
+    async def root_status():
+        return {
+            "app_name": settings.APP_NAME,
+            "version": settings.APP_VERSION,
+            "status": "online",
+            "description": "FastAPI RAG Policy Engine for Calder County Household Support Program",
+            "documentation": "/docs",
+            "health_check": "/api/health",
+            "policy_summary": "/api/policies/summary",
+            "frontend_url": "https://the-grounded-answer.vercel.app",
+        }
