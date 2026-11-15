@@ -12,6 +12,22 @@ async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events."""
     logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION} ({settings.APP_ENV})")
     init_db()
+    
+    # Safe database verification & automatic population on ephemeral containers
+    try:
+        from app.database.models import get_all_clauses
+        if len(get_all_clauses()) == 0:
+            logger.info("Database empty on startup; auto-populating official policy corpus...")
+            from app.ingestion.service import run_ingestion
+            from pathlib import Path
+            manual_path = Path(settings.POLICY_DOCS_DIR) / "policy-manual.md"
+            amd_path = Path(settings.POLICY_DOCS_DIR) / "Amendment No. 2026-01.md"
+            if manual_path.exists() and amd_path.exists():
+                run_ingestion(manual_path, amd_path)
+                logger.info("Official policy corpus auto-ingested successfully.")
+    except Exception as e:
+        logger.error(f"Error verifying policy database on startup: {e}")
+        
     yield
     logger.info("Shutting down application")
 
