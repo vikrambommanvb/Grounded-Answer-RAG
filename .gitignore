@@ -70,3 +70,5 @@ data/vector_store/*
 *.swp
 *.swo
 
+.vercel
+.env*
