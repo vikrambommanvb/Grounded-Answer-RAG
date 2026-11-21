@@ -477,7 +477,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Case C: Pre-amendment Overpayment/Reporting conflict (§4.3.2 vs §9.1.4)
     if (
       (qLower.includes('pre-amendment') || !detDate || detDate < '2026-03-01') &&
-      qLower.includes('report') &&
+      (qLower.includes('report') || (qLower.includes('4.3') && qLower.includes('9.1')) || (qLower.includes('10 days') && qLower.includes('30 days'))) &&
       (qLower.includes('overpayment') || qLower.includes('prevent') || qLower.includes('conflict') || qLower.includes('deadline'))
     ) {
       return res.status(200).json({
@@ -535,7 +535,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Case E: Missing Critical Dates (e.g. Rate-sensitive inquiry without dates)
-    const isRateQuery = qLower.includes('income threshold') || qLower.includes('earnings disregard') || qLower.includes('sanction percentage');
+    const isRateQuery = (qLower.includes('income threshold') || qLower.includes('earnings disregard') || qLower.includes('sanction percentage'))
+      && !qLower.includes('6.4.2') && !qLower.includes('per earner') && !qLower.includes('per household');
     if (isRateQuery && !detDate && !chgDate && !claimStart && !claimEnd) {
       return res.status(200).json({
         status: 'REFUSED',
@@ -610,6 +611,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       policyExplanation = 'Under pre-amendment consolidated policy rules, countable income excludes the first $120 per month of household earnings from employment (§6.4.1(a)). This disregard applies once per household (§6.4.2).';
       citations.push(
         { clause_id: '§6.4.1(a)', canonical_id: '6.4.1(a)', part_number: 6, section_number: '6.4', exact_quote: 'the first $120 per month of household earnings from employment;', effective_date: '2025-12-31', is_amended: false },
+        { clause_id: '§6.4.2', canonical_id: '6.4.2', part_number: 6, section_number: '6.4', exact_quote: 'The disregard in §6.4.1(a) applies once per household and not once per earner.', effective_date: '2025-12-31', is_amended: false }
+      );
+    }
+    // Inquiry: Earnings Disregard Household Cap (§6.4.2)
+    else if (qLower.includes('6.4.2') || qLower.includes('per earner') || (qLower.includes('earnings disregard') && qLower.includes('household'))) {
+      directAnswer = 'Under §6.4.2, the disregard in §6.4.1(a) applies once per household and not once per earner.';
+      policyExplanation = 'Under §6.4.2 of the Policy Manual, the earnings disregard under §6.4.1(a) is capped at one disregard per household regardless of the number of employed household members.';
+      citations.push(
         { clause_id: '§6.4.2', canonical_id: '6.4.2', part_number: 6, section_number: '6.4', exact_quote: 'The disregard in §6.4.1(a) applies once per household and not once per earner.', effective_date: '2025-12-31', is_amended: false }
       );
     }
