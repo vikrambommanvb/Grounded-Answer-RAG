@@ -67,6 +67,14 @@ class SemanticClauseEmbedder:
             self.clause_vectors.append((c, vec))
         return self
 
+    def load_dict(self, data: Dict[str, Dict[str, float]], clauses: List[ClauseRecord]) -> "SemanticClauseEmbedder":
+        """Restore precomputed clause vectors from static dictionary."""
+        self.clause_vectors = []
+        for c in clauses:
+            vec = data.get(c.clause_id, {})
+            self.clause_vectors.append((c, vec))
+        return self
+
     def search(self, query: str, top_k: int = 10) -> List[Tuple[ClauseRecord, float]]:
         """Compute cosine similarity of query against all indexed clause vectors."""
         if not self.clause_vectors:

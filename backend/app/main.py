@@ -56,6 +56,17 @@ app.include_router(documents.router, prefix="/api")
 app.include_router(evaluation.router, prefix="/api")
 app.include_router(system.router, prefix="/api")
 
+@app.get("/api")
+async def api_root_status():
+    return {
+        "app_name": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "status": "online",
+        "health_check": "/api/health",
+        "policy_summary": "/api/policies/summary",
+        "chat_ask": "/api/chat/ask",
+    }
+
 # Serve built frontend static files if present, or return API status
 import os
 from fastapi import HTTPException

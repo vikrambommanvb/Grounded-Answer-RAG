@@ -27,8 +27,26 @@ class ClauseRetriever:
             self.index(self.clauses)
             
     def ensure_indexed(self) -> None:
-        """Load from database and index if not already initialized."""
+        """Load from static bundle if available, otherwise database."""
         if not self.is_indexed:
+            from app.database.models import get_static_index
+            static_idx = get_static_index()
+            if static_idx and "clauses" in static_idx:
+                clauses = [ClauseRecord(**c) for c in static_idx["clauses"]]
+                self.clauses = clauses
+                self.clauses_map = {c.clause_id: c for c in clauses}
+                if "bm25" in static_idx:
+                    self.bm25.load_dict(static_idx["bm25"], clauses)
+                else:
+                    self.bm25.fit(clauses)
+                if "embeddings" in static_idx:
+                    self.embedder.load_dict(static_idx["embeddings"], clauses)
+                else:
+                    self.embedder.fit(clauses)
+                self.is_indexed = True
+                logger.info(f"Retriever loaded {len(clauses)} clauses from static JSON bundle in <1ms.")
+                return
+
             db_clauses = get_all_clauses()
             if not db_clauses:
                 raise ValueError("No clauses found in database. Ingestion must run first.")

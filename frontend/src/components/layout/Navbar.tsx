@@ -12,18 +12,22 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleMobileMenu,
   isMobileMenuOpen = false,
 }) => {
-  const { data: health } = useQuery({
+  const { data: health, isError, isFetching, refetch } = useQuery({
     queryKey: ['health'],
     queryFn: fetchHealth,
-    refetchInterval: 30000,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   const { data: config } = useQuery({
     queryKey: ['systemConfig'],
     queryFn: fetchSystemConfig,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
   });
 
-  const isHealthy = health?.status === 'ok' || health?.status === 'healthy';
+  const isHealthy = !isError && (health?.status === 'ok' || health?.status === 'healthy');
   const activeProvider = config?.active_provider || health?.default_provider || 'mock';
 
   return (
@@ -77,8 +81,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="tnum font-mono text-[11px] font-medium sm:hidden">148 Cl</span>
         </div>
 
-        {/* Operational Health Pulse */}
-        <div className="flex items-center gap-1.5 sm:gap-2 pl-2 sm:pl-3 border-l border-[#E5E5E0] shrink-0">
+        {/* Operational Health Status (Click to re-verify) */}
+        <button
+          type="button"
+          onClick={() => refetch()}
+          title="System health indicator. Click to re-verify status."
+          className="flex items-center gap-1.5 sm:gap-2 pl-2 sm:pl-3 border-l border-[#E5E5E0] shrink-0 pressable hover:opacity-80 transition-opacity"
+        >
           <span className="relative flex h-2 w-2">
             {isHealthy ? (
               <>
@@ -90,9 +99,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </span>
           <span className="meta-caps text-[#171A21] text-[10px] sm:text-xs">
-            {isHealthy ? 'Online' : 'Reconnecting'}
+            {isFetching ? 'Checking...' : isHealthy ? 'Online' : 'Reconnecting'}
           </span>
-        </div>
+        </button>
       </div>
     </header>
   );

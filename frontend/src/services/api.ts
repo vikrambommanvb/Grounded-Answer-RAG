@@ -13,19 +13,17 @@ import {
 
 /**
  * Resolves the backend API base endpoint URL:
- * - On Vercel (grounded-answer-rag.vercel.app) or local development:
- *   Always routes through the edge / dev proxy ('/api') to eliminate Safari CORS "Load failed" errors,
- *   remove preflight OPTIONS latency, and ensure reliable proxying to Render.
- * - If explicitly configured with an alternative external host, normalizes and uses it.
+ * - On Vercel or localhost:
+ *   Routes through the relative '/api' route handled by native serverless functions and edge rewrites.
+ * - Handles missing environment variables safely.
  */
 const getApiBase = (): string => {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
-    // When running on Vercel or localhost, prioritize same-origin '/api' proxy
     if (host.includes('vercel.app') || host === 'localhost' || host === '127.0.0.1') {
       const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
-      // Allow override only if not the Render backend (which is handled by vercel.json)
-      if (envUrl && !envUrl.includes('onrender.com') && envUrl !== '/api') {
+      // Allow override only if explicitly set to an alternative external server
+      if (envUrl && !envUrl.includes('vercel.app') && !envUrl.includes('onrender.com') && envUrl !== '/api') {
         const cleanUrl = envUrl.replace(/\/+$/, '');
         return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
       }
@@ -43,9 +41,119 @@ const getApiBase = (): string => {
 
 export const API_BASE = getApiBase();
 
+/**
+ * Parses HTTP responses and extracts real, actionable error messages with HTTP status codes.
+ * Prevents blank "Query failed: " messages when HTTP/2 statusText is empty.
+ */
+export const formatHttpError = async (res: Response): Promise<string> => {
+  const status = res.status;
+  let detail = '';
+
+  try {
+    const data = await res.json();
+    if (data && typeof data === 'object') {
+      detail = data.detail || data.message || data.error || '';
+    }
+  } catch {
+    try {
+      const text = await res.text();
+      if (text && text.length < 300 && !text.includes('<!DOCTYPE') && !text.includes('<html')) {
+        detail = text.trim();
+      }
+    } catch {
+      // ignore parsing failure
+    }
+  }
+
+  if (detail) {
+    return `[HTTP ${status}] ${detail}`;
+  }
+
+  switch (status) {
+    case 400:
+      return `[HTTP 400] Bad Request: Invalid inquiry parameters submitted.`;
+    case 404:
+      return `[HTTP 404] Not Found: Requested policy endpoint could not be found.`;
+    case 408:
+      return `[HTTP 408] Request Timeout: The policy engine did not respond in time.`;
+    case 422:
+      return `[HTTP 422] Unprocessable Entity: Verification failed for input parameters.`;
+    case 500:
+      return `[HTTP 500] Internal Server Error: Policy evaluation encountered an unexpected issue.`;
+    case 502:
+      return `[HTTP 502] Bad Gateway: Unable to connect to upstream policy service.`;
+    case 503:
+      return `[HTTP 503] Service Unavailable: The policy engine is temporarily unavailable.`;
+    case 504:
+      return `[HTTP 504] Gateway Timeout: The policy engine timed out while processing.`;
+    default:
+      return `[HTTP ${status}] Request failed with status code ${status}.`;
+  }
+};
+
+interface FetchWithRetryOptions extends RequestInit {
+  timeoutMs?: number;
+  retries?: number;
+  retryDelayMs?: number;
+}
+
+/**
+ * Resilient fetch with client-side timeout (AbortController) and automatic 1-retry fallback.
+ */
+export const fetchWithTimeoutAndRetry = async (
+  url: string,
+  options: FetchWithRetryOptions = {}
+): Promise<Response> => {
+  const {
+    timeoutMs = 15000,
+    retries = 1,
+    retryDelayMs = 800,
+    ...fetchOpts
+  } = options;
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const res = await fetch(url, {
+        ...fetchOpts,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      // Retry once on transient upstream gateway failures (502, 503, 504)
+      if (attempt < retries && [502, 503, 504].includes(res.status)) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        continue;
+      }
+
+      return res;
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      const isAbort = err.name === 'AbortError' || err.message?.includes('aborted');
+      lastError = isAbort
+        ? new Error(`Request timed out after ${timeoutMs / 1000}s while contacting policy engine.`)
+        : new Error(err.message || 'Network connection failed.');
+
+      if (attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        continue;
+      }
+    }
+  }
+
+  throw lastError || new Error('Request failed after retry.');
+};
+
 export const fetchHealth = async (): Promise<HealthResponse> => {
-  const res = await fetch(`${API_BASE}/health`);
-  if (!res.ok) throw new Error(`Health check failed: ${res.statusText}`);
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/health`, { timeoutMs: 8000, retries: 1 });
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Health check failed: ${errMsg}`);
+  }
   const data = await res.json();
   return {
     ...data,
@@ -54,24 +162,42 @@ export const fetchHealth = async (): Promise<HealthResponse> => {
 };
 
 export const askQuestion = async (req: QueryRequest): Promise<QueryResponse> => {
-  const res = await fetch(`${API_BASE}/chat/ask`, {
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/chat/ask`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(req),
+    timeoutMs: 25000,
+    retries: 1,
   });
   if (!res.ok) {
-    const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.detail || `Query failed: ${res.statusText}`);
+    const errMsg = await formatHttpError(res);
+    throw new Error(errMsg);
   }
   return res.json();
 };
 
 export const fetchPolicySummary = async (): Promise<PolicySummary> => {
-  const res = await fetch(`${API_BASE}/policies/summary`).catch(() => fetch(`${API_BASE}/policies`));
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/policies/summary`, { timeoutMs: 10000, retries: 1 })
+    .catch(() => fetchWithTimeoutAndRetry(`${API_BASE}/policies`, { timeoutMs: 10000, retries: 1 }))
+    .catch(() => fetchWithTimeoutAndRetry(`/data/clause_index.json`, { timeoutMs: 8000, retries: 0 }));
+
   if (!res.ok) {
-    const fallbackRes = await fetch(`${API_BASE}/policies`);
-    if (!fallbackRes.ok) throw new Error(`Failed to fetch policy summary: ${res.statusText}`);
-    return fallbackRes.json();
+    const fallbackRes = await fetchWithTimeoutAndRetry(`/data/clause_index.json`, { timeoutMs: 8000, retries: 0 });
+    if (fallbackRes.ok) {
+      const bundle = await fallbackRes.json();
+      return {
+        title: "Calder County Household Support Program Policy Manual",
+        total_parts: bundle.metadata.total_parts,
+        total_sections: bundle.metadata.total_sections,
+        total_clauses: bundle.metadata.total_clauses,
+        baseline_date: bundle.metadata.baseline_effective_date,
+        amendment_number: bundle.metadata.amendment_number,
+        amendment_effective_date: bundle.metadata.amendment_effective_date,
+        parts: bundle.parts,
+      };
+    }
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to fetch policy summary: ${errMsg}`);
   }
   return res.json();
 };
@@ -89,8 +215,44 @@ export const fetchClauses = async (
     params.set('amended_only', amendedOnly.toString());
   }
   const url = `${API_BASE}/policies/clauses?${params.toString()}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch clauses: ${res.statusText}`);
+  
+  let res: Response;
+  try {
+    res = await fetchWithTimeoutAndRetry(url, { timeoutMs: 10000, retries: 1 });
+  } catch (err) {
+    // Static fallback if API route is temporarily unreachable
+    const staticRes = await fetchWithTimeoutAndRetry(`/data/clause_index.json`, { timeoutMs: 8000, retries: 0 });
+    if (staticRes.ok) {
+      const bundle = await staticRes.json();
+      let filtered = bundle.clauses as any[];
+      if (partNumber !== undefined && partNumber !== null) {
+        filtered = filtered.filter((c) => c.part_number === partNumber);
+      }
+      return {
+        total: filtered.length,
+        clauses: filtered.map((item: any) => ({
+          clause_id: item.clause_id,
+          part_number: item.part_number,
+          section_number: item.section_number,
+          section_title: item.section_title,
+          title: item.title || item.clause_id,
+          verbatim_text: item.full_text || item.verbatim_text || '',
+          is_amended: Boolean(item.is_amended),
+          amended_text: item.amended_text || null,
+          amendment_action: item.amendment_action || null,
+          effective_date: item.effective_date,
+          transitional_rule: item.transitional_rule || null,
+          cross_references: item.cross_references || [],
+        })),
+      };
+    }
+    throw err;
+  }
+
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to fetch clauses: ${errMsg}`);
+  }
   const data = await res.json();
 
   if (Array.isArray(data)) {
@@ -117,8 +279,11 @@ export const fetchClauses = async (
 
 export const fetchClauseDetail = async (clauseId: string): Promise<ClauseDetail> => {
   const encoded = encodeURIComponent(clauseId);
-  const res = await fetch(`${API_BASE}/policies/clauses/${encoded}`);
-  if (!res.ok) throw new Error(`Failed to fetch clause ${clauseId}: ${res.statusText}`);
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/policies/clauses/${encoded}`, { timeoutMs: 10000, retries: 1 });
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to fetch clause ${clauseId}: ${errMsg}`);
+  }
   const data = await res.json();
 
   if (data.clause) {
@@ -142,8 +307,11 @@ export const fetchClauseDetail = async (clauseId: string): Promise<ClauseDetail>
 };
 
 export const fetchTimeline = async (): Promise<TimelineResponse> => {
-  const res = await fetch(`${API_BASE}/policies/timeline`);
-  if (!res.ok) throw new Error(`Failed to fetch timeline: ${res.statusText}`);
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/policies/timeline`, { timeoutMs: 10000, retries: 1 });
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to fetch timeline: ${errMsg}`);
+  }
   const data = await res.json();
 
   if (Array.isArray(data)) {
@@ -193,8 +361,11 @@ export const fetchTimeline = async (): Promise<TimelineResponse> => {
 };
 
 export const fetchDocuments = async (): Promise<SourceDocument[]> => {
-  const res = await fetch(`${API_BASE}/documents`);
-  if (!res.ok) throw new Error(`Failed to fetch documents: ${res.statusText}`);
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/documents`, { timeoutMs: 10000, retries: 1 });
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to fetch documents: ${errMsg}`);
+  }
   const list = await res.json();
   return list.map((d: any) => {
     const isAmd = d.document_id.includes('AMD') || d.title?.toLowerCase().includes('amendment');
@@ -213,8 +384,11 @@ export const fetchDocuments = async (): Promise<SourceDocument[]> => {
 
 export const fetchDocumentDetail = async (docId: string): Promise<SourceDocumentDetail> => {
   const encoded = encodeURIComponent(docId);
-  const res = await fetch(`${API_BASE}/documents/${encoded}`);
-  if (!res.ok) throw new Error(`Failed to fetch document ${docId}: ${res.statusText}`);
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/documents/${encoded}`, { timeoutMs: 10000, retries: 1 });
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to fetch document ${docId}: ${errMsg}`);
+  }
   const data = await res.json();
   const d = data.document || data;
   const isAmd = d.document_id?.includes('AMD') || d.title?.toLowerCase().includes('amendment');
@@ -232,22 +406,33 @@ export const fetchDocumentDetail = async (docId: string): Promise<SourceDocument
 };
 
 export const fetchEvaluationSummary = async (): Promise<EvaluationSummary> => {
-  const res = await fetch(`${API_BASE}/evaluation/summary`);
-  if (!res.ok) throw new Error(`Failed to fetch evaluation summary: ${res.statusText}`);
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/evaluation/summary`, { timeoutMs: 10000, retries: 1 });
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to fetch evaluation summary: ${errMsg}`);
+  }
   return res.json();
 };
 
 export const runEvaluation = async (provider: string = 'mock'): Promise<EvaluationSummary> => {
   const params = new URLSearchParams({ provider });
-  const res = await fetch(`${API_BASE}/evaluation/run?${params.toString()}`, {
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/evaluation/run?${params.toString()}`, {
     method: 'POST',
+    timeoutMs: 30000,
+    retries: 1,
   });
-  if (!res.ok) throw new Error(`Failed to run evaluation: ${res.statusText}`);
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to run evaluation: ${errMsg}`);
+  }
   return res.json();
 };
 
 export const fetchSystemConfig = async (): Promise<SystemConfig> => {
-  const res = await fetch(`${API_BASE}/system/config`);
-  if (!res.ok) throw new Error(`Failed to fetch system config: ${res.statusText}`);
+  const res = await fetchWithTimeoutAndRetry(`${API_BASE}/system/config`, { timeoutMs: 10000, retries: 1 });
+  if (!res.ok) {
+    const errMsg = await formatHttpError(res);
+    throw new Error(`Failed to fetch system config: ${errMsg}`);
+  }
   return res.json();
 };

@@ -82,6 +82,19 @@ class BM25Index:
             self.idf[term] = math.log(1.0 + (self.n_docs - freq + 0.5) / (freq + 0.5))
             
         return self
+
+    def load_dict(self, data: dict, clauses: List[ClauseRecord]) -> "BM25Index":
+        """Restore precomputed BM25 parameters from static dictionary."""
+        self.clauses = clauses
+        self.k1 = data.get("k1", 1.5)
+        self.b = data.get("b", 0.75)
+        self.avgdl = data.get("avgdl", 0.0)
+        self.n_docs = data.get("n_docs", len(clauses))
+        self.doc_lens = data.get("doc_lens", [])
+        self.doc_tokens = data.get("doc_tokens", [])
+        self.doc_freqs = Counter(data.get("doc_freqs", {}))
+        self.idf = data.get("idf", {})
+        return self
         
     def search(self, query: str, top_k: int = 10) -> List[Tuple[ClauseRecord, float]]:
         """Score all clauses against query tokens using BM25 with exact-citation boosting."""

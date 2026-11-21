@@ -156,3 +156,21 @@ The introduction of **Amendment No. 2026-01** (effective 1 March 2026) represent
 2. **Multi-Jurisdiction Policy Manuals:** The engine is optimized for Calder County HSP. Multi-county federated policy switching can be enabled by introducing a `county_id` tenant partition key in SQLite.
 3. **Casework Case File Persistence:** Currently, caseworkers query policies anonymously. Adding encrypted case-file attachment storage would allow the assistant to automatically extract dates from uploaded PDF notices.
 
+---
+
+## 10. Production Stability Architecture: Static Pre-Indexed Corpus & Resilient Serverless Migration
+
+### 10.1 Root Cause of Intermittent Outages
+1. **External Container Inactivity Sleep:** The frontend previously relied on a reverse-proxy rewrite to an external free-tier backend container that shut down after 15 minutes of inactivity. Cold starts took 45–60 seconds, exceeding Vercel edge proxy timeouts and yielding `504 Gateway Timeout` errors.
+2. **Empty Error String in HTTP/2:** When network timeouts occurred, standard HTTP/2 `res.statusText` was empty (`""`), causing the client error handler to evaluate to a blank `"Query failed: "` message in the Casework Assistant UI.
+3. **Aggressive Health Polling:** The status badge polled `/api/health` every 30 seconds. A single timeout permanently locked the badge into `"RECONNECTING"`.
+4. **Runtime Index Rebuilding:** The clause retrieval index was constructed at runtime in ephemeral Python memory rather than pre-compiled at build time.
+
+### 10.2 Architectural Fix
+1. **Build-Time Static Clause Index (`scripts/build_clause_index.py`):** Precomputed all 148 baseline clauses, 9 amendment items, BM25 inverse document frequencies, and semantic term vectors into a verified static JSON bundle (`data/clause_index.json` and `frontend/public/data/clause_index.json`). The engine initializes from static JSON in < 1 ms with zero database or cold-start overhead.
+2. **Native Vercel Serverless Deployment (`api/index.py`):** Added a native Python serverless API handler with `maxDuration: 60` and `includeFiles: "data/**,docs/**,backend/**"` in `vercel.json`. The entire application is self-contained on Vercel without reliance on temporary servers or sleeping instances.
+3. **Resilient Error Extraction & Retry Protocol (`frontend/src/services/api.ts`):** Implemented `formatHttpError` to surface descriptive HTTP status messages. Implemented `fetchWithTimeoutAndRetry` with a 15-second client timeout and automatic 1-retry fallback on network or 5xx gateway faults.
+4. **On-Demand Health Verification (`frontend/src/components/layout/Navbar.tsx`):** Eliminated continuous 30-second background polling in favor of cached status (`staleTime: 60000`) with click-to-reverify user interaction.
+5. **Static Client Resilience:** If the API is ever unreachable, the Policy Explorer, Timeline, and Document Registry transparently fall back to `/data/clause_index.json`.
+
+

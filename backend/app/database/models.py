@@ -1,9 +1,36 @@
 """Database repository and data access methods."""
 import json
 import sqlite3
+from pathlib import Path
 from typing import List, Optional, Dict, Any
 from app.database.session import get_connection
 from app.api.schemas.policy import ClauseRecord, AmendmentRecord, DocumentRecord
+from app.core.config import settings, BASE_DIR
+
+_STATIC_INDEX_CACHE: Optional[Dict[str, Any]] = None
+
+def get_static_index() -> Optional[Dict[str, Any]]:
+    """Retrieve pre-built static clause index bundle if available."""
+    global _STATIC_INDEX_CACHE
+    if _STATIC_INDEX_CACHE is not None:
+        return _STATIC_INDEX_CACHE
+        
+    candidates = [
+        Path(BASE_DIR) / "data" / "clause_index.json",
+        Path(__file__).resolve().parent.parent.parent.parent / "data" / "clause_index.json",
+        Path("data/clause_index.json"),
+        Path("/var/task/data/clause_index.json"),
+        Path("/app/data/clause_index.json"),
+    ]
+    for c in candidates:
+        if c.exists():
+            try:
+                with open(c, "r", encoding="utf-8") as f:
+                    _STATIC_INDEX_CACHE = json.load(f)
+                    return _STATIC_INDEX_CACHE
+            except Exception:
+                pass
+    return None
 
 def save_document(doc: DocumentRecord) -> None:
     """Save or update a document metadata record."""
@@ -99,6 +126,13 @@ def save_amendments(amendments: List[AmendmentRecord]) -> None:
 def get_clause_by_id(clause_id: str) -> Optional[ClauseRecord]:
     """Retrieve a single clause by ID (e.g. §4.3.2 or 4.3.2)."""
     norm_id = clause_id if clause_id.startswith("§") else f"§{clause_id}"
+    idx = get_static_index()
+    if idx and "clauses" in idx:
+        for c in idx["clauses"]:
+            if c.get("clause_id") == norm_id or c.get("canonical_id") == clause_id.lstrip("§"):
+                return ClauseRecord(**c)
+        return None
+
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM clauses WHERE clause_id = ?", (norm_id,))
@@ -110,6 +144,10 @@ def get_clause_by_id(clause_id: str) -> Optional[ClauseRecord]:
 
 def get_all_clauses() -> List[ClauseRecord]:
     """Retrieve all clauses sorted by part and canonical ID."""
+    idx = get_static_index()
+    if idx and "clauses" in idx:
+        return [ClauseRecord(**c) for c in idx["clauses"]]
+
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM clauses ORDER BY part_number, canonical_id")
@@ -119,6 +157,10 @@ def get_all_clauses() -> List[ClauseRecord]:
 
 def get_all_amendments() -> List[AmendmentRecord]:
     """Retrieve all amendment items."""
+    idx = get_static_index()
+    if idx and "amendments" in idx:
+        return [AmendmentRecord(**a) for a in idx["amendments"]]
+
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM amendments ORDER BY item_number")
@@ -128,6 +170,10 @@ def get_all_amendments() -> List[AmendmentRecord]:
 
 def get_all_documents() -> List[DocumentRecord]:
     """Retrieve all registered documents."""
+    idx = get_static_index()
+    if idx and "documents" in idx:
+        return [DocumentRecord(**d) for d in idx["documents"]]
+
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM documents")
