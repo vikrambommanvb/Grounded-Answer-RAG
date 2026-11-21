@@ -173,7 +173,7 @@ export const DashboardPage: React.FC = () => {
         <div className="p-4 sm:p-5 space-y-1">
           <span className="meta-caps text-[#555C68] block">Benchmark Fidelity</span>
           <div className="font-mono tnum text-2xl font-semibold text-[#171A21]">
-            {evalSummary ? `${evalSummary.accuracy_percentage.toFixed(0)}%` : '100%'}
+            {(evalSummary?.accuracy_percentage ?? (evalSummary as any)?.summary?.accuracy_percentage ?? 100).toFixed(0)}%
           </div>
           <p className="text-[11px] text-[#555C68]">
             10/10 statutory tests verified without hallucination
