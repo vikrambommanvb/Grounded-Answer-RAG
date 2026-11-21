@@ -12,6 +12,9 @@ function getBundle(): any {
     path.join(process.cwd(), 'data', 'clause_index.json'),
     path.join(__dirname, '..', 'data', 'clause_index.json'),
     path.join(process.cwd(), 'frontend', 'public', 'data', 'clause_index.json'),
+    path.join(process.cwd(), 'public', 'data', 'clause_index.json'),
+    path.join(__dirname, '..', 'public', 'data', 'clause_index.json'),
+    path.join(__dirname, 'data', 'clause_index.json'),
   ];
 
   for (const p of candidatePaths) {
@@ -186,7 +189,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  const url = (req.url || '').split('?')[0];
+  let url = (req.headers['x-matched-path'] as string) || (req.headers['x-vercel-matched-path'] as string) || req.url || '';
+  url = url.split('?')[0];
+
+  if (req.query && req.query.slug) {
+    const slugParts = Array.isArray(req.query.slug) ? req.query.slug.join('/') : req.query.slug;
+    url = `/api/${slugParts}`;
+  }
+  if (!url.startsWith('/api') && url.length > 0) {
+    url = `/api${url.startsWith('/') ? '' : '/'}${url}`;
+  }
   const bundle = getBundle();
 
   // Route 1: Health

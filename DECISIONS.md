@@ -168,9 +168,10 @@ The introduction of **Amendment No. 2026-01** (effective 1 March 2026) represent
 
 ### 10.2 Architectural Fix
 1. **Build-Time Static Clause Index (`scripts/build_clause_index.py`):** Precomputed all 148 baseline clauses, 9 amendment items, BM25 inverse document frequencies, and semantic term vectors into a verified static JSON bundle (`data/clause_index.json` and `frontend/public/data/clause_index.json`). The engine initializes from static JSON in < 1 ms with zero database or cold-start overhead.
-2. **Native Vercel Serverless Deployment (`api/index.py`):** Added a native Python serverless API handler with `maxDuration: 60` and `includeFiles: "data/**,docs/**,backend/**"` in `vercel.json`. The entire application is self-contained on Vercel without reliance on temporary servers or sleeping instances.
-3. **Resilient Error Extraction & Retry Protocol (`frontend/src/services/api.ts`):** Implemented `formatHttpError` to surface descriptive HTTP status messages. Implemented `fetchWithTimeoutAndRetry` with a 15-second client timeout and automatic 1-retry fallback on network or 5xx gateway faults.
-4. **On-Demand Health Verification (`frontend/src/components/layout/Navbar.tsx`):** Eliminated continuous 30-second background polling in favor of cached status (`staleTime: 60000`) with click-to-reverify user interaction.
-5. **Static Client Resilience:** If the API is ever unreachable, the Policy Explorer, Timeline, and Document Registry transparently fall back to `/data/clause_index.json`.
+2. **Native Vercel Serverless TypeScript Engine (`api/index.ts` & `api/[...slug].ts`):** Implemented a native TypeScript serverless handler with `maxDuration: 60` and `includeFiles: "data/**,docs/**"`. Using Node.js eliminates CPython compilation overhead and external container cold starts entirely; requests resolve in < 5 ms in memory.
+3. **Dual-Root Monorepo Compatibility:** Mirrored serverless API routes and static index into both root (`api/`) and workspace (`frontend/api/`), ensuring instant zero-configuration deployment regardless of whether Vercel is configured with root directory `.` or `frontend`.
+4. **Resilient Error Extraction & Retry Protocol (`frontend/src/services/api.ts`):** Implemented `formatHttpError` to surface descriptive HTTP status messages. Implemented `fetchWithTimeoutAndRetry` with a 15-second client timeout and automatic 1-retry fallback on network or 5xx gateway faults.
+5. **On-Demand Health Verification (`frontend/src/components/layout/Navbar.tsx`):** Eliminated continuous 30-second background polling in favor of cached status (`staleTime: 60000`) with click-to-reverify user interaction.
+6. **Static Client Resilience:** If the API is ever unreachable, the Policy Explorer, Timeline, and Document Registry transparently fall back to `/data/clause_index.json`.
 
 
