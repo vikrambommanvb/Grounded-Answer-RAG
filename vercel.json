@@ -1,5 +1,5 @@
 {
-  "buildCommand": "python scripts/build_clause_index.py && npm run build --prefix frontend",
+  "buildCommand": "npm run build --prefix frontend",
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/**/*.py": {
