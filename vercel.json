@@ -2,9 +2,9 @@
   "buildCommand": "npm run build --prefix frontend",
   "outputDirectory": "frontend/dist",
   "functions": {
-    "api/**/*.py": {
+    "api/**/*.ts": {
       "maxDuration": 60,
-      "includeFiles": "data/**,docs/**,backend/**"
+      "includeFiles": "data/**,docs/**"
     }
   },
   "rewrites": [

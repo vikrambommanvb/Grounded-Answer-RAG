@@ -1,0 +1,11 @@
+{
+  "name": "the-grounded-answer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix frontend"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.2.0"
+  }
+}
